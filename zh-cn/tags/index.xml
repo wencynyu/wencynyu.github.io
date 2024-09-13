@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Tags on wenxin-blog</title>
+        <link>http://localhost:1313/zh-cn/tags/</link>
+        <description>Recent content in Tags on wenxin-blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>yuwenxin</copyright>
+        <lastBuildDate>Sat, 14 Sep 2024 02:06:14 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>神经网络</title>
+        <link>http://localhost:1313/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>数理基础</title>
+        <link>http://localhost:1313/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Css</title>
+        <link>http://localhost:1313/zh-cn/tags/css/</link>
+        <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/css/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Html</title>
+        <link>http://localhost:1313/zh-cn/tags/html/</link>
+        <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/html/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Markdown</title>
+        <link>http://localhost:1313/zh-cn/tags/markdown/</link>
+        <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/markdown/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Themes</title>
+        <link>http://localhost:1313/zh-cn/tags/themes/</link>
+        <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/themes/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Example Tag</title>
+        <link>http://localhost:1313/zh-cn/tags/example-tag/</link>
+        <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/tags/example-tag/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>

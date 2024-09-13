@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="数学基础： 高等数学：导数、微分、偏导数（多元函数导数）\n线性代数：向量、行列式、矩阵的基本运算、秩\n高等数学 导数 \\[ f'(x_0) = \\frac{dy}{dx} = \\lim_{x \\to x_0} \\frac{f(x) - f(x_0)}{x - x_0} \\]极限 ε δ 语言： 函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\\epsilon &gt; 0$，都存在 $\\delta &gt; 0$，使得在 $0 &lt; |x - x_0| &lt; \\delta$ 时，不等式 $|f(x) - a| &lt; \\epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \\to x_0$ 时的极限，记作： ">
+<title>神经网络</title>
+
+<link rel='canonical' href='http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="神经网络">
+<meta property='og:description' content="数学基础： 高等数学：导数、微分、偏导数（多元函数导数）\n线性代数：向量、行列式、矩阵的基本运算、秩\n高等数学 导数 \\[ f'(x_0) = \\frac{dy}{dx} = \\lim_{x \\to x_0} \\frac{f(x) - f(x_0)}{x - x_0} \\]极限 ε δ 语言： 函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\\epsilon &gt; 0$，都存在 $\\delta &gt; 0$，使得在 $0 &lt; |x - x_0| &lt; \\delta$ 时，不等式 $|f(x) - a| &lt; \\epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \\to x_0$ 时的极限，记作： ">
+<meta property='og:url' content='http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
+<meta property='og:site_name' content='wenxin-blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='神经网络' /><meta property='article:tag' content='数理基础' /><meta property='article:published_time' content='2024-09-14T02:06:14&#43;08:00'/><meta property='article:modified_time' content='2024-09-14T02:06:14&#43;08:00'/>
+<meta name="twitter:title" content="神经网络">
+<meta name="twitter:description" content="数学基础： 高等数学：导数、微分、偏导数（多元函数导数）\n线性代数：向量、行列式、矩阵的基本运算、秩\n高等数学 导数 \\[ f'(x_0) = \\frac{dy}{dx} = \\lim_{x \\to x_0} \\frac{f(x) - f(x_0)}{x - x_0} \\]极限 ε δ 语言： 函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\\epsilon &gt; 0$，都存在 $\\delta &gt; 0$，使得在 $0 &lt; |x - x_0| &lt; \\delta$ 时，不等式 $|f(x) - a| &lt; \\epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \\to x_0$ 时的极限，记作： ">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu897059592634026878.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/zh-cn">wenxin-blog</a></h1>
+            <h2 class="site-description">There are some programing and life blog by wenxin.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/wencynyu'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/zh-cn/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/zh-cn/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/zh-cn/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/zh-cn/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#数学基础">数学基础：</a></li>
+    <li><a href="#高等数学">高等数学</a>
+      <ol>
+        <li><a href="#导数">导数</a></li>
+        <li><a href="#极限">极限</a></li>
+        <li><a href="#微分">微分</a></li>
+        <li><a href="#偏导">偏导</a></li>
+        <li><a href="#偏导的链式法则">偏导的链式法则</a>
+          <ol>
+            <li><a href="#证明">证明</a></li>
+            <li><a href="#链式法则的偏导数">链式法则的偏导数</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#线性代数">线性代数</a>
+      <ol>
+        <li><a href="#向量的定义">向量的定义</a></li>
+        <li><a href="#行列式的定义">行列式的定义</a></li>
+        <li><a href="#矩阵的定义">矩阵的定义</a></li>
+        <li><a href="#矩阵的基本运算">矩阵的基本运算</a>
+          <ol>
+            <li><a href="#1-矩阵加法">1. 矩阵加法</a></li>
+            <li><a href="#2-矩阵减法">2. 矩阵减法</a></li>
+            <li><a href="#3-矩阵数乘">3. 矩阵数乘</a></li>
+            <li><a href="#4-矩阵乘法">4. 矩阵乘法</a></li>
+            <li><a href="#5-矩阵转置">5. 矩阵转置</a></li>
+            <li><a href="#6-矩阵的逆">6. 矩阵的逆</a></li>
+            <li><a href="#7-矩阵的秩">7. 矩阵的秩</a></li>
+            <li><a href="#举例">举例</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#机器学习基本概念">机器学习基本概念</a>
+      <ol>
+        <li><a href="#ml类别">ml类别</a>
+          <ol>
+            <li><a href="#监督学习">监督学习</a></li>
+            <li><a href="#无监督学习">无监督学习</a></li>
+          </ol>
+        </li>
+        <li><a href="#注">注：</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" >
+                人工智能
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">神经网络</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 14, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="数学基础">数学基础：
+</h2><p>高等数学：导数、微分、偏导数（多元函数导数）</p>
+<p>线性代数：向量、行列式、矩阵的基本运算、秩</p>
+<h2 id="高等数学">高等数学
+</h2><h3 id="导数">导数
+</h3>\[
+f'(x_0) = \frac{dy}{dx} = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} 
+\]<h3 id="极限">极限
+</h3><p>ε δ 语言：
+函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\epsilon &gt; 0$，都存在 $\delta &gt; 0$，使得在 $0 &lt; |x - x_0| &lt; \delta$ 时，不等式 $|f(x) - a| &lt; \epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \to x_0$ 时的极限，记作：
+</p>
+$$
+\lim_{x \to x_0} f(x) = a
+$$<h3 id="微分">微分
+</h3><p>函数变化量 = 变化率 * 参数变化量
+</p>
+$$
+df(x) = f'(x) \, dx
+$$<h3 id="偏导">偏导
+</h3><p>对于一个多元函数 $f(x_1, x_2, \ldots, x_n)$，它在点 $(x_1^0, x_2^0, \ldots, x_n^0)$ 处的偏导数相对于 $x_i$ 是：
+</p>
+$$
+\frac{\partial f}{\partial x_i} = \lim_{h \to 0} \frac{f(x_1^0, \ldots, x_i^0 + h, \ldots, x_n^0) - f(x_1^0, \ldots, x_i^0, \ldots, x_n^0)}{h}
+$$<h3 id="偏导的链式法则">偏导的链式法则
+</h3><p>假设我们有两个函数 $u = g(x_1, x_2, \ldots, x_n)$ 和 $y = f(u)$，其中 $u$ 是 $x_1, x_2, \ldots, x_n$ 的函数，而 $y$ 是 $u$ 的函数。我们希望找到 $y$ 对 $x_i$ 的偏导数。</p>
+<p><strong>链式法则</strong>的定义是：</p>
+$$
+\frac{\partial y}{\partial x_i} = \frac{\partial y}{\partial u} \cdot \frac{\partial u}{\partial x_i}
+$$<p>其中：</p>
+<ul>
+<li>$\frac{\partial y}{\partial u}$ 是 $y$ 对 $u$ 的偏导数。</li>
+<li>$\frac{\partial u}{\partial x_i}$ 是 $u$ 对 $x_i$ 的偏导数。</li>
+</ul>
+<h4 id="证明">证明
+</h4><p>全微分关系为：
+</p>
+$$ dz = \frac{\partial z}{\partial u} \, du + \frac{\partial z}{\partial v} \, dv $$<p>由于 $u$ 和 $v$ 是 $x$ 和 $y$ 的函数，我们有：
+</p>
+$$ du = \frac{\partial u}{\partial x} \, dx + \frac{\partial u}{\partial y} \, dy $$$$ dv = \frac{\partial v}{\partial x} \, dx + \frac{\partial v}{\partial y} \, dy $$<p>将这些代入全微分公式中，得到：
+</p>
+$$ dz = \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} \right) dx + \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} \right) dy $$<h4 id="链式法则的偏导数">链式法则的偏导数
+</h4><p>根据全微分关系，链式法则的偏导数为：
+</p>
+$$ \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} $$$$ \frac{\partial z}{\partial y} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} $$<h2 id="线性代数">线性代数
+</h2><h3 id="向量的定义">向量的定义
+</h3><p><strong>向量</strong>是一个具有大小和方向的量，通常在多维空间中表示为一个有序的数列。一个 $n$ 维向量可以写作：</p>
+$$
+\mathbf{v} = \begin{bmatrix}
+v_1 \\
+v_2 \\
+\vdots \\
+v_n
+\end{bmatrix}
+$$<h3 id="行列式的定义">行列式的定义
+</h3><p><strong>行列式</strong>是一个方阵的一个标量值，它可以用来描述矩阵的某些性质，比如可逆性。对于一个 $n \times n$ 的方阵 $A$，行列式记作 $\det(A)$ 或 $|A|$，可以表示为：</p>
+<p>对于 $2 \times 2$ 矩阵：</p>
+$$
+\det \begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix} = ad - bc
+$$<p>对于 $3 \times 3$ 矩阵：</p>
+$$
+\det \begin{pmatrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{pmatrix} = aei + bfg + cdh - ceg - bdi - afh
+$$<h3 id="矩阵的定义">矩阵的定义
+</h3><p><strong>矩阵</strong>是一个按照矩形阵列排列的数值集合。一个 $m \times n$ 的矩阵可以表示为：</p>
+$$
+A = \begin{bmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn}
+\end{bmatrix}
+$$<h3 id="矩阵的基本运算">矩阵的基本运算
+</h3><h4 id="1-矩阵加法">1. 矩阵加法
+</h4><p>两个同型矩阵 $A$ 和 $B$ 的加法是元素对应相加，得到的新矩阵为：
+如果
+</p>
+$$
+A = \begin{bmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{bmatrix}
+$$$$
+B = \begin{bmatrix}
+b_{11} & b_{12} \\
+b_{21} & b_{22}
+\end{bmatrix}
+$$<p>
+那么
+</p>
+$$
+A + B = \begin{bmatrix}
+a_{11} + b_{11} & a_{12} + b_{12} \\
+a_{21} + b_{21} & a_{22} + b_{22}
+\end{bmatrix}
+$$<h4 id="2-矩阵减法">2. 矩阵减法
+</h4><p>两个同型矩阵 $A$ 和 $B$ 的减法是元素对应相减，得到的新矩阵为：
+</p>
+$$
+A - B = \begin{bmatrix}
+a_{11} - b_{11} & a_{12} - b_{12} \\
+a_{21} - b_{21} & a_{22} - b_{22}
+\end{bmatrix}
+$$<h4 id="3-矩阵数乘">3. 矩阵数乘
+</h4><p>矩阵 $A$ 与标量 $k$ 的数乘是矩阵中每个元素都乘以 $k$，得到的新矩阵为：
+如果
+</p>
+$$
+A = \begin{bmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{bmatrix}
+$$<p>
+那么
+</p>
+$$
+kA = \begin{bmatrix}
+ka_{11} & ka_{12} \\
+ka_{21} & ka_{22}
+\end{bmatrix}
+$$<h4 id="4-矩阵乘法">4. 矩阵乘法
+</h4><p>两个矩阵 $A$ 和 $B$ 的乘法是矩阵 $A$ 的行向量与矩阵 $B$ 的列向量的内积，得到的新矩阵 $C$ 为：
+如果
+</p>
+$$
+A = \begin{bmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{bmatrix}
+$$$$
+B = \begin{bmatrix}
+b_{11} & b_{12} \\
+b_{21} & b_{22}
+\end{bmatrix}
+$$<p>
+那么
+</p>
+$$
+C = AB = \begin{bmatrix}
+a_{11}b_{11} + a_{12}b_{21} & a_{11}b_{12} + a_{12}b_{22} \\
+a_{21}b_{11} + a_{22}b_{21} & a_{21}b_{12} + a_{22}b_{22}
+\end{bmatrix}
+$$<h4 id="5-矩阵转置">5. 矩阵转置
+</h4><p>矩阵 $A$ 的转置是将矩阵 $A$ 的行和列互换得到的新矩阵 $A^T$：
+如果
+</p>
+$$
+A = \begin{bmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{bmatrix}
+$$<p>
+那么
+</p>
+$$
+A^T = \begin{bmatrix}
+a_{11} & a_{21} \\
+a_{12} & a_{22}
+\end{bmatrix}
+$$<h4 id="6-矩阵的逆">6. 矩阵的逆
+</h4><p>矩阵 $A$ 的逆矩阵 $A^{-1}$ 是使得 $AA^{-1} = A^{-1}A = I$ 的矩阵，其中 $I$ 是单位矩阵。对于 $2 \times 2$ 矩阵 $A$，如果行列式 $\det(A) \neq 0$，其逆矩阵为：
+如果
+</p>
+$$
+A = \begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}
+$$<p>
+那么
+</p>
+$$
+A^{-1} = \frac{1}{\det(A)} \begin{bmatrix}
+d & -b \\
+-c & a
+\end{bmatrix}
+$$<p>
+其中行列式 $\det(A)$ 为：
+</p>
+$$
+\det(A) = ad - bc
+$$<h4 id="7-矩阵的秩">7. 矩阵的秩
+</h4><p><strong>矩阵的秩</strong>（rank）是矩阵中线性无关的行（或列）的最大数量。矩阵的秩可以用来判断矩阵的行或列的线性独立性。</p>
+<p>对于一个 $m \times n$ 的矩阵 $A$，秩定义为：</p>
+<ul>
+<li>矩阵 $A$ 的<strong>行秩</strong>：矩阵 $A$ 的最大线性无关的行的数量。</li>
+<li>矩阵 $A$ 的<strong>列秩</strong>：矩阵 $A$ 的最大线性无关的列的数量。</li>
+</ul>
+<p>行秩和列秩总是相等，这个公共值称为矩阵的秩，记作 $\text{rank}(A)$。</p>
+<h4 id="举例">举例
+</h4><p>假设有一个矩阵 $A$：</p>
+$$
+A = \begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{bmatrix}
+$$<p>矩阵 $A$ 的秩是 $2$，因为矩阵的行或列中最大数量的线性无关的行或列是 $2$。</p>
+<h5 id="步骤">步骤
+</h5><p>r2 = r2 - 4*r1</p>
+<p>r3 = r3 - 7*r1</p>
+<p>r2 = -1/3*r2</p>
+<p>r3 = r3 + 6*r2</p>
+<h2 id="机器学习基本概念">机器学习基本概念
+</h2><h3 id="ml类别">ml类别
+</h3><h4 id="监督学习">监督学习
+</h4><p>有数据标注的机器学习</p>
+<h5 id="分类问题">分类问题
+</h5><p>给出X样本，以及样本中每一行对应的标注结果集Y</p>
+<p>根据样本特征，预测新样本的结果</p>
+<h5 id="回归问题">回归问题
+</h5><p>给出X样本，以及样本中每一行对应的标注结果集Y</p>
+<p>根据样本特征，预测新样本的趋势</p>
+<h4 id="无监督学习">无监督学习
+</h4><p>无数据标注的机器学习</p>
+<h5 id="聚类问题">聚类问题
+</h5><p>仅给出X样本</p>
+<p>通过算法划分出不同的类别。</p>
+<h3 id="注">注：
+</h3><p>大多数机器学习应用多属于监督学习，后续仅对knn聚类算法做了简单介绍，其他算法均为监督学习。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">神经网络</a>
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/">数理基础</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            1998 - 
+        
+        2024 yuwenxin
+    </section>
+    
+    <section class="powerby">
+        
+            welcome to wenxin-blog <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.27.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

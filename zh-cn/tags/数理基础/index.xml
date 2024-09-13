@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>数理基础 on wenxin-blog</title>
+        <link>http://localhost:1313/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</link>
+        <description>Recent content in 数理基础 on wenxin-blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>yuwenxin</copyright>
+        <lastBuildDate>Sat, 14 Sep 2024 02:06:14 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>神经网络</title>
+        <link>http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <description>&lt;h2 id=&#34;数学基础&#34;&gt;数学基础：
+&lt;/h2&gt;&lt;p&gt;高等数学：导数、微分、偏导数（多元函数导数）&lt;/p&gt;
+&lt;p&gt;线性代数：向量、行列式、矩阵的基本运算、秩&lt;/p&gt;
+&lt;h1 id=&#34;高等数学&#34;&gt;高等数学
+&lt;/h1&gt;&lt;h2 id=&#34;导数&#34;&gt;导数
+&lt;/h2&gt;\[
+f&#39;(x_0) = \frac{dy}{dx} = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} 
+\]&lt;h2 id=&#34;极限&#34;&gt;极限
+&lt;/h2&gt;&lt;p&gt;ε δ 语言：
+函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\epsilon &amp;gt; 0$，都存在 $\delta &amp;gt; 0$，使得在 $0 &amp;lt; |x - x_0| &amp;lt; \delta$ 时，不等式 $|f(x) - a| &amp;lt; \epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \to x_0$ 时的极限，记作：
+&lt;/p&gt;
+$$
+\lim_{x \to x_0} f(x) = a
+$$&lt;h2 id=&#34;微分&#34;&gt;微分
+&lt;/h2&gt;&lt;p&gt;函数变化量 = 变化率 * 参数变化量
+&lt;/p&gt;
+$$
+df(x) = f&#39;(x) \, dx
+$$&lt;h2 id=&#34;偏导&#34;&gt;偏导
+&lt;/h2&gt;&lt;p&gt;对于一个多元函数 $f(x_1, x_2, \ldots, x_n)$，它在点 $(x_1^0, x_2^0, \ldots, x_n^0)$ 处的偏导数相对于 $x_i$ 是：
+&lt;/p&gt;
+$$
+\frac{\partial f}{\partial x_i} = \lim_{h \to 0} \frac{f(x_1^0, \ldots, x_i^0 + h, \ldots, x_n^0) - f(x_1^0, \ldots, x_i^0, \ldots, x_n^0)}{h}
+$$&lt;h3 id=&#34;偏导的链式法则&#34;&gt;偏导的链式法则
+&lt;/h3&gt;&lt;p&gt;假设我们有两个函数 $u = g(x_1, x_2, \ldots, x_n)$ 和 $y = f(u)$，其中 $u$ 是 $x_1, x_2, \ldots, x_n$ 的函数，而 $y$ 是 $u$ 的函数。我们希望找到 $y$ 对 $x_i$ 的偏导数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;链式法则&lt;/strong&gt;的定义是：&lt;/p&gt;
+$$
+\frac{\partial y}{\partial x_i} = \frac{\partial y}{\partial u} \cdot \frac{\partial u}{\partial x_i}
+$$&lt;p&gt;其中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$\frac{\partial y}{\partial u}$ 是 $y$ 对 $u$ 的偏导数。&lt;/li&gt;
+&lt;li&gt;$\frac{\partial u}{\partial x_i}$ 是 $u$ 对 $x_i$ 的偏导数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;证明&#34;&gt;证明
+&lt;/h3&gt;&lt;p&gt;全微分关系为：
+&lt;/p&gt;
+$$ dz = \frac{\partial z}{\partial u} \, du + \frac{\partial z}{\partial v} \, dv $$&lt;p&gt;由于 $u$ 和 $v$ 是 $x$ 和 $y$ 的函数，我们有：
+&lt;/p&gt;
+$$ du = \frac{\partial u}{\partial x} \, dx + \frac{\partial u}{\partial y} \, dy $$$$ dv = \frac{\partial v}{\partial x} \, dx + \frac{\partial v}{\partial y} \, dy $$&lt;p&gt;将这些代入全微分公式中，得到：
+&lt;/p&gt;
+$$ dz = \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} \right) dx + \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} \right) dy $$&lt;h3 id=&#34;链式法则的偏导数&#34;&gt;链式法则的偏导数
+&lt;/h3&gt;&lt;p&gt;根据全微分关系，链式法则的偏导数为：
+&lt;/p&gt;
+$$ \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} $$$$ \frac{\partial z}{\partial y} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} $$</description>
+        </item>
+        
+    </channel>
+</rss>

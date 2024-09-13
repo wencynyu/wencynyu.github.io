@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on wenxin-blog</title>
+        <link>http://localhost:1313/zh-cn/post/</link>
+        <description>Recent content in Posts on wenxin-blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>yuwenxin</copyright>
+        <lastBuildDate>Sat, 14 Sep 2024 02:06:14 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Hello World</title>
+        <link>http://localhost:1313/zh-cn/p/hello-world/</link>
+        <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/hello-world/</guid>
+        <description>&lt;img src="http://localhost:1313/zh-cn/p/hello-world/cover.jpg" alt="Featured image of post Hello World" /&gt;&lt;h1 id=&#34;计算机网络&#34;&gt;计算机网络
+&lt;/h1&gt;&lt;p&gt;本文主要参考了谢希仁老师编著的《计算机网络》教材第七版，并且后续会更新本书的全部章节，帮助每个程序员新人来理解相关的概念。&lt;/p&gt;
+&lt;p&gt;文章中包含了许多体系化的知识以及相关的发展历史，个人认为据因寻果是一种非常有助于理解学习的内容，激发学习的兴趣的一种学习方法。希望能给各位同学们带来些许帮助。
+@&lt;a class=&#34;link&#34; href=&#34;%e6%96%87%e7%ab%a0%e7%9b%ae%e5%bd%95&#34; &gt;TOC&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;网络概述&#34;&gt;网络概述
+&lt;/h2&gt;&lt;p&gt;80后出生的许多人都被认为是生活在网络的时代，但其实，早在电报被广泛使用的二十世纪初，网络便渗透进了每个人的日常生活中。通信网络，使得每个人接收信息更加快速与便捷，直到计算机网络被广泛使用的现在，信息的透明度以及便捷度相较于非信息时代的时间里不可同日而语，现如今，某个明星早上出的八卦内容，在当天就能给某些企业的服务器带来巨大的流量压力；信息的快速传播也给此次的新型流感防疫工作带来了明显的帮助。如果你是相关专业的同学，阅读这篇文章能给你带来对网络的进一步理解，而非相关专业的同学也能收获一些通用的信息知识。&lt;/p&gt;
+&lt;h3 id=&#34;网络的分类&#34;&gt;网络的分类
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;电信网络&lt;/li&gt;
+&lt;li&gt;有线电视网络&lt;/li&gt;
+&lt;li&gt;计算机网络&lt;/li&gt;
+&lt;/ol&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;网络类型&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;主要应用&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;应用抽象&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;电信网络&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;电报，电话，传真&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;音频内容&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;有线电视网络&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;电视&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;视频内容&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;计算机网络&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;计算机（电脑）&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;多媒体内容，数据文件&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;理论上来讲，三种网络融合成一种带宽足够大的网络即可提供所有服务，但出于对经济以及行政方面的考量，这样的设想还是很难推进。不过在应用层面，已经有许多计算机（包含pc，手机等个人计算机设备）软件已经提供了基于计算机网络的视频或通信功能。&lt;/p&gt;
+&lt;h3 id=&#34;网络的性质&#34;&gt;网络的性质
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;连通性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用网络的两端用户之间，无论距离远近均能非常便捷，经济地交换各种信息，好像用户终端都彼此连通一般，故称其为连通性。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;共享性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;网络上的资源能够共享，并且网络上公开的资源就好像在用户身边一样便于使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;网络的这两种性质，基本概述了网络的基本功能：数据传输。
+不过网络对于数据传输的方法，却经历了大概3个时期：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;电路交换：整个报文的比特流连续的从源点直达终点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这是一种非常”古老“的数据传输方式，通常用于电信网络（电报电话）。
+它的工作流程大致如下：
+建立连接&amp;ndash;&amp;gt;通信&amp;ndash;&amp;gt;释放连接
+在整个通信期间，两个用户始终占用端到端的通信资源，这样虽然信息流传输速率比较快，但是将会导致通信成本非常高昂以及通信资源的大量浪费。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;报文交换：整个报文先传送到相邻节点，全部存储完成后查找转发表，转发到下一个节点，依次类推直到到达通信终点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这种传输方式解决了用户对端到端通信资源的持续占用，不过每次转发需要存储整个报文，必然会导致传输速率非常慢，延迟非常高，因此这是一种较不成熟的过渡传输方法。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;分组交换：报文分组后将单个分组传输到相邻节点，存储下来后查找转发表，转发到下一个节点，依次类推直到到达通信终点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在报文交换的基础上进行了分组，每次转发只需要存储一边单一分组即可，不同的划分也会影响到其传输性能，不过在研究者们的刻苦攻坚下，这个问题基本以及被解决，优秀的分组计划可以加快数据的传输，虽然速率可能比不过电路交换那种连续点到点的通信，不过通信资源占用量低，可以大大降低通信成本，让每个人都有参与网络使用的机会，加速网络的普及。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/195545dba34caa80bfb2e3496cee27d8.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;三种数据传输方式的图解&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;网络性能主要指标&#34;&gt;网络性能主要指标
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;速率
+单位：bps，bit per second，比特每秒&lt;/li&gt;
+&lt;li&gt;带宽（易混淆）
+带宽分为时域带宽与频域带宽
+频域带宽：电子信号所占据的频带宽度，单位Hz
+时域带宽：即最高速率，单位与速率相同，bps&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;我们现实生活中讨论的带宽通常是指时域带宽，例如你在电信公司办理了一个100M光前宽带，这里的100M就是100Mbps，换算为字节后要除以8（1Byte=8bit），也就成为了你下载的下行速率12.5MB/s。&lt;/p&gt;
+&lt;p&gt;而频域带宽，这里以5G移动网络信号为例：
+&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/b5872b08af779a5a4312cbeaa046a99a.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;5G频段-中国&#34;
+	
+	
+&gt;
+频域带宽就是电子信号所占据的频带宽度，不同的频域带宽，根据频率波长的关系，它的性能也往往有所差异，因此，有限的优秀频段往往成为一种竞争化的资源。这里再以5G移动网络信号为例：
+&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/50a1ce64c8f24fb7e5526aa7f10227d9.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;5G频段-全球&#34;
+	
+	
+&gt;
+这里不难看出，各国的频域带宽都是不同的，以避免信号之间的相互干扰，不过具体的频段优劣，涉及到国与国之间的内容，这里不做详述。&lt;/p&gt;
+&lt;p&gt;3.吞吐量（易混淆）
+吞吐量表示的是单位时间内实际传输的信号数量，因此，单位又是bps（惊不惊喜意不意外）。
+这里着重强调的是实际传输，因此这个参数也是一个能比较真实的反应你所使用的网络的性能的指标，它也往往会低于电信运营商所标识的额定时域带宽。&lt;/p&gt;
+&lt;h2 id=&#34;计算机网络互联网概述&#34;&gt;计算机网络（互联网）概述
+&lt;/h2&gt;&lt;p&gt;上面的内容还是对于所有网络这个宏观的概念进行讲解，下面进入计算机网络（后文简称计网）的概述内容。&lt;/p&gt;
+&lt;p&gt;在RFC[1208]中，规定了互联网（Internet）与互连网（internet）属于不同的概念，简单地说，互连网包含了互联网（实际中两者基本通用）。&lt;/p&gt;
+&lt;h3 id=&#34;计网的组成&#34;&gt;计网的组成
+&lt;/h3&gt;&lt;p&gt;计算机网络（网络）由若干个结点（非节点）和连接这些结点的链路所组成。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这里结点与节点的区分，个人理解为结点可以包含多个节点
+结点可以是由一个个微型的私人局域网，路由器，交换机等用以提供网络服务的host所构成&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这里所有接入互联网，由用户直接使用的主机被称为：互联网的&lt;strong&gt;边缘部分&lt;/strong&gt;
+大量网络和连接它们的路由器等为互联网的边缘部分提供服务的设施被称为：互联网的&lt;strong&gt;核心部分&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;计算机网络的组成部分中，最为核心的部件是&lt;strong&gt;路由器&lt;/strong&gt;，它是实现&lt;strong&gt;分组交换&lt;/strong&gt;的关键构件，任务是转发所有被其收到的数据包分组。&lt;/p&gt;
+&lt;h4 id=&#34;计网的通信架构&#34;&gt;计网的通信架构
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;C/S，client and server
+这里的client主要是向互联网申请各种服务的用户；
+server是在互联网范围内给用户提供实际服务的企业或个人。
+互联网的绝大多数应用都是基于此架构。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;P2P，peer to peer，也可以理解为person to person
+这里的每台主机既是客户端，又是服务端，相较于C/S架构使用量较少
+最典型的应用就是P2P下载应用，每台主机都可以作为内容的暂存者，当你需要下载某些数据时，可以优先找到能提供更快速率下载的peer直接下载，不需要每次都访问官方的server，极大的加快下载速率。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;计网的发展&#34;&gt;计网的发展
+&lt;/h3&gt;&lt;h4 id=&#34;一-单个网络arpanet向互联网发展实验阶段1969-1990&#34;&gt;一、 单个网络ARPANET向互联网发展（实验阶段：1969-1990）
+&lt;/h4&gt;&lt;p&gt;高级研究计划局网络（英语：Advanced Research Projects Agency Network），通称阿帕网（英语：ARPANET）是美国国防高级研究计划局开发的世界上第一个运营的数据包交换网络，是全球互联网的鼻祖。&lt;/p&gt;
+&lt;p&gt;最初，arpanet只是一个单个的分组交换网，并非是一个互连的网络，随着时间的发展，通信需求的增加带来了许多通信协议的诞生，这些通信协议又有利于更高级的协议编写，慢慢地，由TCP/IP协议族（20世纪80年代，有心的同学可以结合计算机在这个时期的发展来进行更深度的思考）为主导的互联网开始显露出来。 &amp;ndash;wiki百科&lt;/p&gt;
+&lt;h4 id=&#34;二三级结构的互联网雏形科研阶段21世纪初期&#34;&gt;二、三级结构的互联网雏形（科研阶段：21世纪初期）
+&lt;/h4&gt;&lt;p&gt;主干网络-&amp;gt;地区网络-&amp;gt;校园/企业网络&lt;/p&gt;
+&lt;h4 id=&#34;三多层次isp结构的互联网实用阶段现在&#34;&gt;三、多层次ISP结构的互联网（实用阶段：现在）
+&lt;/h4&gt;&lt;p&gt;名词解释ISP：Internet Service Provider，互联网服务提供商，也就是我们国家的电信运营商（电信，移动等），基本上所有的网络服务（主干网）都是由他们建造并提供相应的服务。&lt;/p&gt;
+&lt;p&gt;主干ISP-&amp;gt;地区ISP-&amp;gt;企业网络/本地ISP-&amp;gt;个人网络&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/93ab11f7878e48245148ae6f15d43707.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;多层次ISP互联网图解&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;计网的标准化工作流程&#34;&gt;计网的标准化工作流程
+&lt;/h4&gt;&lt;p&gt;组织：IETF，互联网工程部；IETF，互联网研究部&lt;/p&gt;
+&lt;h5 id=&#34;三大阶段由先到后&#34;&gt;三大阶段（由先到后）
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;互联网草案（每个草案大约保存6个月）&lt;/li&gt;
+&lt;li&gt;互联网建议标准（录入至RFC文档）&lt;/li&gt;
+&lt;li&gt;互联网标准（多个RFC文档的关联）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;计网体系结构重点&#34;&gt;计网体系结构（重点）
+&lt;/h3&gt;&lt;p&gt;仅仅有物理通路用以传输数据对于计算机之间还远远不够，面对计算机之间的通信，还需要处理以下几个问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;激活物理通路&lt;/li&gt;
+&lt;li&gt;识别接收对象&lt;/li&gt;
+&lt;li&gt;检测网络连接正常&lt;/li&gt;
+&lt;li&gt;审核准备工作&lt;/li&gt;
+&lt;li&gt;数据格式转换&lt;/li&gt;
+&lt;li&gt;出错备案&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;ARPANET提出了”分层”的方法，这些问题在后面的各个网络协议中被分别解决。&lt;/p&gt;
+&lt;h4 id=&#34;网络协议&#34;&gt;网络协议
+&lt;/h4&gt;&lt;p&gt;osi七层网络模型中，每一层的实现都有相对应的网络协议。
+包含但不限于：ARP，RARP，IPv4/v6，TCP，HTTP，FTP，SMTP，SSL等协议
+这些协议通常扮演者一个统一化的角色，因此我们需要了解网络协议的相关概念。&lt;/p&gt;
+&lt;h5 id=&#34;定义&#34;&gt;定义
+&lt;/h5&gt;&lt;p&gt;为进行网络中的数据交换而建立的规则，标准，或约定被称为网络协议。（==》这些内容规定了传输的数据格式及有关的同步问题。）&lt;/p&gt;
+&lt;h5 id=&#34;三要素&#34;&gt;三要素
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;语法：数据与控制信息的结构或格式&lt;/li&gt;
+&lt;li&gt;语义：控制及响应信息&lt;/li&gt;
+&lt;li&gt;同步：事件实现的详细说明&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;另：单机程序可以不需要任何网络协议的参与，例如一个简单的hello world程序。&lt;/p&gt;
+&lt;h4 id=&#34;网络模型&#34;&gt;&lt;strong&gt;网络模型&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/1c07347bc88391d073ad2f619426f3cc.jpeg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;网络模型&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;tcpip模型&#34;&gt;tcp/ip模型
+&lt;/h5&gt;&lt;p&gt;这是使用最为广泛的一个网络模型&lt;/p&gt;
+&lt;h5 id=&#34;osi七层模型&#34;&gt;osi七层模型
+&lt;/h5&gt;&lt;p&gt;这是最官方的一个网络模型&lt;/p&gt;
+&lt;h5 id=&#34;tcpip五层网络模型&#34;&gt;tcp/ip五层网络模型
+&lt;/h5&gt;&lt;p&gt;这是一个折中的网络模型&lt;/p&gt;
+&lt;p&gt;tcp/ip模型中的网络接口被拆分为物理层与数据链路层。&lt;/p&gt;
+&lt;h5 id=&#34;网络模型中的数据传输内容以osi模型为例&#34;&gt;网络模型中的数据传输内容（以osi模型为例）
+&lt;/h5&gt;&lt;p&gt;除物理层中传输的为&lt;strong&gt;比特流&lt;/strong&gt;以外，其他各层都以&lt;strong&gt;数据包&lt;/strong&gt;的形式来传输数据（&lt;strong&gt;数据包~=数据头部header+数据内容&lt;/strong&gt;）。&lt;/p&gt;
+&lt;p&gt;数据头部在每个网络协议中都有不同的规定，根据这些规定加上相关的算法，就可以解决上文提到的，计算机网络传输数据还需要处理的几个问题。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;激活物理通路&lt;/li&gt;
+&lt;li&gt;识别接收对象&lt;/li&gt;
+&lt;li&gt;检测网络连接正常&lt;/li&gt;
+&lt;li&gt;审核准备工作&lt;/li&gt;
+&lt;li&gt;数据格式转换&lt;/li&gt;
+&lt;li&gt;出错备案&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>神经网络</title>
+        <link>http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <description>&lt;h2 id=&#34;数学基础&#34;&gt;数学基础：
+&lt;/h2&gt;&lt;p&gt;高等数学：导数、微分、偏导数（多元函数导数）&lt;/p&gt;
+&lt;p&gt;线性代数：向量、行列式、矩阵的基本运算、秩&lt;/p&gt;
+&lt;h2 id=&#34;高等数学&#34;&gt;高等数学
+&lt;/h2&gt;&lt;h3 id=&#34;导数&#34;&gt;导数
+&lt;/h3&gt;\[
+f&#39;(x_0) = \frac{dy}{dx} = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} 
+\]&lt;h3 id=&#34;极限&#34;&gt;极限
+&lt;/h3&gt;&lt;p&gt;ε δ 语言：
+函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\epsilon &amp;gt; 0$，都存在 $\delta &amp;gt; 0$，使得在 $0 &amp;lt; |x - x_0| &amp;lt; \delta$ 时，不等式 $|f(x) - a| &amp;lt; \epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \to x_0$ 时的极限，记作：
+&lt;/p&gt;
+$$
+\lim_{x \to x_0} f(x) = a
+$$&lt;h3 id=&#34;微分&#34;&gt;微分
+&lt;/h3&gt;&lt;p&gt;函数变化量 = 变化率 * 参数变化量
+&lt;/p&gt;
+$$
+df(x) = f&#39;(x) \, dx
+$$&lt;h3 id=&#34;偏导&#34;&gt;偏导
+&lt;/h3&gt;&lt;p&gt;对于一个多元函数 $f(x_1, x_2, \ldots, x_n)$，它在点 $(x_1^0, x_2^0, \ldots, x_n^0)$ 处的偏导数相对于 $x_i$ 是：
+&lt;/p&gt;
+$$
+\frac{\partial f}{\partial x_i} = \lim_{h \to 0} \frac{f(x_1^0, \ldots, x_i^0 + h, \ldots, x_n^0) - f(x_1^0, \ldots, x_i^0, \ldots, x_n^0)}{h}
+$$&lt;h3 id=&#34;偏导的链式法则&#34;&gt;偏导的链式法则
+&lt;/h3&gt;&lt;p&gt;假设我们有两个函数 $u = g(x_1, x_2, \ldots, x_n)$ 和 $y = f(u)$，其中 $u$ 是 $x_1, x_2, \ldots, x_n$ 的函数，而 $y$ 是 $u$ 的函数。我们希望找到 $y$ 对 $x_i$ 的偏导数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;链式法则&lt;/strong&gt;的定义是：&lt;/p&gt;
+$$
+\frac{\partial y}{\partial x_i} = \frac{\partial y}{\partial u} \cdot \frac{\partial u}{\partial x_i}
+$$&lt;p&gt;其中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$\frac{\partial y}{\partial u}$ 是 $y$ 对 $u$ 的偏导数。&lt;/li&gt;
+&lt;li&gt;$\frac{\partial u}{\partial x_i}$ 是 $u$ 对 $x_i$ 的偏导数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;证明&#34;&gt;证明
+&lt;/h4&gt;&lt;p&gt;全微分关系为：
+&lt;/p&gt;
+$$ dz = \frac{\partial z}{\partial u} \, du + \frac{\partial z}{\partial v} \, dv $$&lt;p&gt;由于 $u$ 和 $v$ 是 $x$ 和 $y$ 的函数，我们有：
+&lt;/p&gt;
+$$ du = \frac{\partial u}{\partial x} \, dx + \frac{\partial u}{\partial y} \, dy $$$$ dv = \frac{\partial v}{\partial x} \, dx + \frac{\partial v}{\partial y} \, dy $$&lt;p&gt;将这些代入全微分公式中，得到：
+&lt;/p&gt;
+$$ dz = \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} \right) dx + \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} \right) dy $$&lt;h4 id=&#34;链式法则的偏导数&#34;&gt;链式法则的偏导数
+&lt;/h4&gt;&lt;p&gt;根据全微分关系，链式法则的偏导数为：
+&lt;/p&gt;
+$$ \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} $$$$ \frac{\partial z}{\partial y} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} $$&lt;h2 id=&#34;线性代数&#34;&gt;线性代数
+&lt;/h2&gt;&lt;h3 id=&#34;向量的定义&#34;&gt;向量的定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;向量&lt;/strong&gt;是一个具有大小和方向的量，通常在多维空间中表示为一个有序的数列。一个 $n$ 维向量可以写作：&lt;/p&gt;
+$$
+\mathbf{v} = \begin{bmatrix}
+v_1 \\
+v_2 \\
+\vdots \\
+v_n
+\end{bmatrix}
+$$&lt;h3 id=&#34;行列式的定义&#34;&gt;行列式的定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;行列式&lt;/strong&gt;是一个方阵的一个标量值，它可以用来描述矩阵的某些性质，比如可逆性。对于一个 $n \times n$ 的方阵 $A$，行列式记作 $\det(A)$ 或 $|A|$，可以表示为：&lt;/p&gt;
+&lt;p&gt;对于 $2 \times 2$ 矩阵：&lt;/p&gt;
+$$
+\det \begin{pmatrix}
+a &amp; b \\
+c &amp; d
+\end{pmatrix} = ad - bc
+$$&lt;p&gt;对于 $3 \times 3$ 矩阵：&lt;/p&gt;
+$$
+\det \begin{pmatrix}
+a &amp; b &amp; c \\
+d &amp; e &amp; f \\
+g &amp; h &amp; i
+\end{pmatrix} = aei + bfg + cdh - ceg - bdi - afh
+$$&lt;h3 id=&#34;矩阵的定义&#34;&gt;矩阵的定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;矩阵&lt;/strong&gt;是一个按照矩形阵列排列的数值集合。一个 $m \times n$ 的矩阵可以表示为：&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
+a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{m1} &amp; a_{m2} &amp; \cdots &amp; a_{mn}
+\end{bmatrix}
+$$&lt;h3 id=&#34;矩阵的基本运算&#34;&gt;矩阵的基本运算
+&lt;/h3&gt;&lt;h4 id=&#34;1-矩阵加法&#34;&gt;1. 矩阵加法
+&lt;/h4&gt;&lt;p&gt;两个同型矩阵 $A$ 和 $B$ 的加法是元素对应相加，得到的新矩阵为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$$$
+B = \begin{bmatrix}
+b_{11} &amp; b_{12} \\
+b_{21} &amp; b_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+A + B = \begin{bmatrix}
+a_{11} + b_{11} &amp; a_{12} + b_{12} \\
+a_{21} + b_{21} &amp; a_{22} + b_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;2-矩阵减法&#34;&gt;2. 矩阵减法
+&lt;/h4&gt;&lt;p&gt;两个同型矩阵 $A$ 和 $B$ 的减法是元素对应相减，得到的新矩阵为：
+&lt;/p&gt;
+$$
+A - B = \begin{bmatrix}
+a_{11} - b_{11} &amp; a_{12} - b_{12} \\
+a_{21} - b_{21} &amp; a_{22} - b_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;3-矩阵数乘&#34;&gt;3. 矩阵数乘
+&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 与标量 $k$ 的数乘是矩阵中每个元素都乘以 $k$，得到的新矩阵为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+kA = \begin{bmatrix}
+ka_{11} &amp; ka_{12} \\
+ka_{21} &amp; ka_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;4-矩阵乘法&#34;&gt;4. 矩阵乘法
+&lt;/h4&gt;&lt;p&gt;两个矩阵 $A$ 和 $B$ 的乘法是矩阵 $A$ 的行向量与矩阵 $B$ 的列向量的内积，得到的新矩阵 $C$ 为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$$$
+B = \begin{bmatrix}
+b_{11} &amp; b_{12} \\
+b_{21} &amp; b_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+C = AB = \begin{bmatrix}
+a_{11}b_{11} + a_{12}b_{21} &amp; a_{11}b_{12} + a_{12}b_{22} \\
+a_{21}b_{11} + a_{22}b_{21} &amp; a_{21}b_{12} + a_{22}b_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;5-矩阵转置&#34;&gt;5. 矩阵转置
+&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 的转置是将矩阵 $A$ 的行和列互换得到的新矩阵 $A^T$：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+A^T = \begin{bmatrix}
+a_{11} &amp; a_{21} \\
+a_{12} &amp; a_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;6-矩阵的逆&#34;&gt;6. 矩阵的逆
+&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 的逆矩阵 $A^{-1}$ 是使得 $AA^{-1} = A^{-1}A = I$ 的矩阵，其中 $I$ 是单位矩阵。对于 $2 \times 2$ 矩阵 $A$，如果行列式 $\det(A) \neq 0$，其逆矩阵为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a &amp; b \\
+c &amp; d
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+A^{-1} = \frac{1}{\det(A)} \begin{bmatrix}
+d &amp; -b \\
+-c &amp; a
+\end{bmatrix}
+$$&lt;p&gt;
+其中行列式 $\det(A)$ 为：
+&lt;/p&gt;
+$$
+\det(A) = ad - bc
+$$&lt;h4 id=&#34;7-矩阵的秩&#34;&gt;7. 矩阵的秩
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;矩阵的秩&lt;/strong&gt;（rank）是矩阵中线性无关的行（或列）的最大数量。矩阵的秩可以用来判断矩阵的行或列的线性独立性。&lt;/p&gt;
+&lt;p&gt;对于一个 $m \times n$ 的矩阵 $A$，秩定义为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;矩阵 $A$ 的&lt;strong&gt;行秩&lt;/strong&gt;：矩阵 $A$ 的最大线性无关的行的数量。&lt;/li&gt;
+&lt;li&gt;矩阵 $A$ 的&lt;strong&gt;列秩&lt;/strong&gt;：矩阵 $A$ 的最大线性无关的列的数量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;行秩和列秩总是相等，这个公共值称为矩阵的秩，记作 $\text{rank}(A)$。&lt;/p&gt;
+&lt;h4 id=&#34;举例&#34;&gt;举例
+&lt;/h4&gt;&lt;p&gt;假设有一个矩阵 $A$：&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+1 &amp; 2 &amp; 3 \\
+4 &amp; 5 &amp; 6 \\
+7 &amp; 8 &amp; 9
+\end{bmatrix}
+$$&lt;p&gt;矩阵 $A$ 的秩是 $2$，因为矩阵的行或列中最大数量的线性无关的行或列是 $2$。&lt;/p&gt;
+&lt;h5 id=&#34;步骤&#34;&gt;步骤
+&lt;/h5&gt;&lt;p&gt;r2 = r2 - 4*r1&lt;/p&gt;
+&lt;p&gt;r3 = r3 - 7*r1&lt;/p&gt;
+&lt;p&gt;r2 = -1/3*r2&lt;/p&gt;
+&lt;p&gt;r3 = r3 + 6*r2&lt;/p&gt;
+&lt;h2 id=&#34;机器学习基本概念&#34;&gt;机器学习基本概念
+&lt;/h2&gt;&lt;h3 id=&#34;ml类别&#34;&gt;ml类别
+&lt;/h3&gt;&lt;h4 id=&#34;监督学习&#34;&gt;监督学习
+&lt;/h4&gt;&lt;p&gt;有数据标注的机器学习&lt;/p&gt;
+&lt;h5 id=&#34;分类问题&#34;&gt;分类问题
+&lt;/h5&gt;&lt;p&gt;给出X样本，以及样本中每一行对应的标注结果集Y&lt;/p&gt;
+&lt;p&gt;根据样本特征，预测新样本的结果&lt;/p&gt;
+&lt;h5 id=&#34;回归问题&#34;&gt;回归问题
+&lt;/h5&gt;&lt;p&gt;给出X样本，以及样本中每一行对应的标注结果集Y&lt;/p&gt;
+&lt;p&gt;根据样本特征，预测新样本的趋势&lt;/p&gt;
+&lt;h4 id=&#34;无监督学习&#34;&gt;无监督学习
+&lt;/h4&gt;&lt;p&gt;无数据标注的机器学习&lt;/p&gt;
+&lt;h5 id=&#34;聚类问题&#34;&gt;聚类问题
+&lt;/h5&gt;&lt;p&gt;仅给出X样本&lt;/p&gt;
+&lt;p&gt;通过算法划分出不同的类别。&lt;/p&gt;
+&lt;h3 id=&#34;注&#34;&gt;注：
+&lt;/h3&gt;&lt;p&gt;大多数机器学习应用多属于监督学习，后续仅对knn聚类算法做了简单介绍，其他算法均为监督学习。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Markdown Syntax Guide</title>
+        <link>http://localhost:1313/zh-cn/p/markdown-syntax-guide/</link>
+        <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/markdown-syntax-guide/</guid>
+        <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;
+&lt;h2 id=&#34;headings&#34;&gt;Headings
+&lt;/h2&gt;&lt;p&gt;The following HTML &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;—&lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; elements represent six levels of section headings. &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt; is the highest section level while &lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; is the lowest.&lt;/p&gt;
+&lt;h1 id=&#34;h1&#34;&gt;H1
+&lt;/h1&gt;&lt;h2 id=&#34;h2&#34;&gt;H2
+&lt;/h2&gt;&lt;h3 id=&#34;h3&#34;&gt;H3
+&lt;/h3&gt;&lt;h4 id=&#34;h4&#34;&gt;H4
+&lt;/h4&gt;&lt;h5 id=&#34;h5&#34;&gt;H5
+&lt;/h5&gt;&lt;h6 id=&#34;h6&#34;&gt;H6
+&lt;/h6&gt;&lt;h2 id=&#34;paragraph&#34;&gt;Paragraph
+&lt;/h2&gt;&lt;p&gt;Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.&lt;/p&gt;
+&lt;p&gt;Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.&lt;/p&gt;
+&lt;h2 id=&#34;blockquotes&#34;&gt;Blockquotes
+&lt;/h2&gt;&lt;p&gt;The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a &lt;code&gt;footer&lt;/code&gt; or &lt;code&gt;cite&lt;/code&gt; element, and optionally with in-line changes such as annotations and abbreviations.&lt;/p&gt;
+&lt;h3 id=&#34;blockquote-without-attribution&#34;&gt;Blockquote without attribution
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;Tiam, ad mint andaepu dandae nostion secatur sequo quae.
+&lt;strong&gt;Note&lt;/strong&gt; that you can use &lt;em&gt;Markdown syntax&lt;/em&gt; within a blockquote.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;blockquote-with-attribution&#34;&gt;Blockquote with attribution
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;Don&amp;rsquo;t communicate by sharing memory, share memory by communicating.&lt;br&gt;
+— &lt;cite&gt;Rob Pike&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/cite&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;tables&#34;&gt;Tables
+&lt;/h2&gt;&lt;p&gt;Tables aren&amp;rsquo;t part of the core Markdown spec, but Hugo supports supports them out-of-the-box.&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Name&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Age&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Bob&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;27&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Alice&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;23&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;inline-markdown-within-tables&#34;&gt;Inline Markdown within tables
+&lt;/h3&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Italics&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Bold&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Code&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;em&gt;italics&lt;/em&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;bold&lt;/strong&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;code&lt;/code&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;A&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;B&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;C&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;D&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;E&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;F&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Phasellus ultricies, sapien non euismod aliquam, dui ligula tincidunt odio, at accumsan nulla sapien eget ex.&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Proin eleifend dictum ipsum, non euismod ipsum pulvinar et. Vivamus sollicitudin, quam in pulvinar aliquam, metus elit pretium purus&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Proin sit amet velit nec enim imperdiet vehicula.&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Ut bibendum vestibulum quam, eu egestas turpis gravida nec&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Sed scelerisque nec turpis vel viverra. Vivamus vitae pretium sapien&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;code-blocks&#34;&gt;Code Blocks
+&lt;/h2&gt;&lt;h3 id=&#34;code-block-with-backticks&#34;&gt;Code block with backticks
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&amp;lt;!doctype html&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;html&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;en&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;head&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;meta&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;charset&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;title&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;Example HTML5 Document&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;title&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;head&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;body&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;Test&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;body&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;html&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;code-block-indented-with-four-spaces&#34;&gt;Code block indented with four spaces
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;&amp;lt;!doctype html&amp;gt;
+&amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+&amp;lt;head&amp;gt;
+  &amp;lt;meta charset=&amp;quot;utf-8&amp;quot;&amp;gt;
+  &amp;lt;title&amp;gt;Example HTML5 Document&amp;lt;/title&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+  &amp;lt;p&amp;gt;Test&amp;lt;/p&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;diff-code-block&#34;&gt;Diff code block
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[dependencies.bevy]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git = &amp;#34;https://github.com/bevyengine/bevy&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;rev = &amp;#34;11f52b8c72fc3a568e8bb4a4cd1f3eb025ac2e13&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;gd&#34;&gt;- features = [&amp;#34;dynamic&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;gd&#34;&gt;&lt;/span&gt;&lt;span class=&#34;gi&#34;&gt;+ features = [&amp;#34;jpeg&amp;#34;, &amp;#34;dynamic&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;one-line-code-block&#34;&gt;One line code block
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;A paragraph&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;list-types&#34;&gt;List Types
+&lt;/h2&gt;&lt;h3 id=&#34;ordered-list&#34;&gt;Ordered List
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;First item&lt;/li&gt;
+&lt;li&gt;Second item&lt;/li&gt;
+&lt;li&gt;Third item&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;unordered-list&#34;&gt;Unordered List
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;List item&lt;/li&gt;
+&lt;li&gt;Another item&lt;/li&gt;
+&lt;li&gt;And another item&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;nested-list&#34;&gt;Nested list
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Fruit
+&lt;ul&gt;
+&lt;li&gt;Apple&lt;/li&gt;
+&lt;li&gt;Orange&lt;/li&gt;
+&lt;li&gt;Banana&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Dairy
+&lt;ul&gt;
+&lt;li&gt;Milk&lt;/li&gt;
+&lt;li&gt;Cheese&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;other-elements--abbr-sub-sup-kbd-mark&#34;&gt;Other Elements — abbr, sub, sup, kbd, mark
+&lt;/h2&gt;&lt;p&gt;&lt;abbr title=&#34;Graphics Interchange Format&#34;&gt;GIF&lt;/abbr&gt; is a bitmap image format.&lt;/p&gt;
+&lt;p&gt;H&lt;sub&gt;2&lt;/sub&gt;O&lt;/p&gt;
+&lt;p&gt;X&lt;sup&gt;n&lt;/sup&gt; + Y&lt;sup&gt;n&lt;/sup&gt; = Z&lt;sup&gt;n&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Press &lt;kbd&gt;CTRL&lt;/kbd&gt; + &lt;kbd&gt;ALT&lt;/kbd&gt; + &lt;kbd&gt;Delete&lt;/kbd&gt; to end the session.&lt;/p&gt;
+&lt;p&gt;Most &lt;mark&gt;salamanders&lt;/mark&gt; are nocturnal, and hunt for insects, worms, and other small creatures.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;The above quote is excerpted from Rob Pike&amp;rsquo;s &lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/watch?v=PAAkCSZUG1c&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;talk&lt;/a&gt; during Gopherfest, November 18, 2015.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description>
+        </item>
+        <item>
+        <title>Image gallery</title>
+        <link>http://localhost:1313/zh-cn/p/image-gallery/</link>
+        <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/image-gallery/</guid>
+        <description>&lt;img src="http://localhost:1313/zh-cn/p/image-gallery/2.jpg" alt="Featured image of post Image gallery" /&gt;&lt;p&gt;Hugo theme Stack supports the creation of interactive image galleries using Markdown. It&amp;rsquo;s powered by &lt;a class=&#34;link&#34; href=&#34;https://photoswipe.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PhotoSwipe&lt;/a&gt; and its syntax was inspired by &lt;a class=&#34;link&#34; href=&#34;https://typlog.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Typlog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To use this feature, the image must be in the same directory as the Markdown file, as it uses Hugo&amp;rsquo;s page bundle feature to read the dimensions of the image. &lt;strong&gt;External images are not supported.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;syntax&#34;&gt;Syntax
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;![&lt;span class=&#34;nt&#34;&gt;Image 1&lt;/span&gt;](&lt;span class=&#34;na&#34;&gt;1.jpg&lt;/span&gt;) ![&lt;span class=&#34;nt&#34;&gt;Image 2&lt;/span&gt;](&lt;span class=&#34;na&#34;&gt;2.jpg&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;result&#34;&gt;Result
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/p/image-gallery/1.jpg&#34;
+	width=&#34;2000&#34;
+	height=&#34;1400&#34;
+	srcset=&#34;http://localhost:1313/zh-cn/p/image-gallery/1_hu4574578169203714971.jpg 480w, http://localhost:1313/zh-cn/p/image-gallery/1_hu9042511268598201431.jpg 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Image 1&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;142&#34;
+		data-flex-basis=&#34;342px&#34;
+	
+&gt; &lt;img src=&#34;http://localhost:1313/zh-cn/p/image-gallery/2.jpg&#34;
+	width=&#34;1500&#34;
+	height=&#34;2250&#34;
+	srcset=&#34;http://localhost:1313/zh-cn/p/image-gallery/2_hu10699635480308914167.jpg 480w, http://localhost:1313/zh-cn/p/image-gallery/2_hu1741040415904021193.jpg 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Image 2&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;66&#34;
+		data-flex-basis=&#34;160px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Photo by &lt;a class=&#34;link&#34; href=&#34;https://unsplash.com/@mymind&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;mymind&lt;/a&gt; and &lt;a class=&#34;link&#34; href=&#34;https://unsplash.com/@lukechesser&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Luke Chesser&lt;/a&gt; on &lt;a class=&#34;link&#34; href=&#34;https://unsplash.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        </item>
+        <item>
+        <title>Shortcodes</title>
+        <link>http://localhost:1313/zh-cn/p/shortcodes/</link>
+        <pubDate>Fri, 25 Aug 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/shortcodes/</guid>
+        <description>&lt;img src="http://localhost:1313/zh-cn/p/shortcodes/cover.jpg" alt="Featured image of post Shortcodes" /&gt;&lt;p&gt;For more details, check out the &lt;a class=&#34;link&#34; href=&#34;https://stack.jimmycai.com/writing/shortcodes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;bilibili-video&#34;&gt;Bilibili video
+&lt;/h2&gt;
+
+
+
+
+
+    
+
+
+&lt;div class=&#34;video-wrapper&#34;&gt;
+    &lt;iframe src=&#34;https://player.bilibili.com/player.html?as_wide=1&amp;amp;high_quality=1&amp;amp;page=1&amp;bvid=BV1d4411N7zD&#34;
+            scrolling=&#34;no&#34;
+            frameborder=&#34;no&#34;
+            framespacing=&#34;0&#34;
+            allowfullscreen=&#34;true&#34;
+    &gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&#34;tencent-video&#34;&gt;Tencent video
+&lt;/h2&gt;
+&lt;div class=&#34;video-wrapper&#34;&gt;
+    &lt;iframe src=&#34;https://v.qq.com/txp/iframe/player.html?vid=g0014r3khdw&amp;auto=0&#34; 
+            scrolling=&#34;no&#34; 
+            frameborder=&#34;no&#34;
+            framespacing=&#34;0&#34; 
+            allowfullscreen=&#34;true&#34;
+    &gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;youtube-video&#34;&gt;YouTube video
+&lt;/h2&gt;&lt;div class=&#34;video-wrapper&#34;&gt;
+    &lt;iframe loading=&#34;lazy&#34; 
+            src=&#34;https://www.youtube.com/embed/0qwALOOvUik&#34; 
+            allowfullscreen 
+            title=&#34;YouTube Video&#34;
+    &gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&#34;generic-video-file&#34;&gt;Generic video file
+&lt;/h2&gt;&lt;div class=&#34;video-wrapper&#34;&gt;
+    &lt;video
+    controls
+    src=&#34;https://www.w3schools.com/tags/movie.mp4&#34;
+    
+    
+    &gt;
+        &lt;p&gt;
+            Your browser doesn&#39;t support HTML5 video. Here is a
+            &lt;a href=&#34;https://www.w3schools.com/tags/movie.mp4&#34;&gt;link to the video&lt;/a&gt; instead.
+        &lt;/p&gt;
+    &lt;/video&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&#34;gist&#34;&gt;Gist
+&lt;/h2&gt;&lt;script src=&#34;https://gist.github.com/CaiJimmy/e2751a943de10b2a5b3a8a6c2120cb86.js&#34;&gt;&lt;/script&gt;
+
+&lt;h2 id=&#34;gitlab&#34;&gt;GitLab
+&lt;/h2&gt;&lt;script
+    type=&#34;application/javascript&#34;
+    src=&#34;https://gitlab.com/-/snippets/2589724.js&#34;
+&gt;&lt;/script&gt;
+&lt;h2 id=&#34;quote&#34;&gt;Quote
+&lt;/h2&gt;&lt;blockquote&gt;
+    &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;&lt;span class=&#34;cite&#34;&gt;&lt;span&gt;― &lt;/span&gt;&lt;span&gt;A famous person, &lt;/span&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Book&#34;&gt;&lt;cite&gt;The book they wrote&lt;/cite&gt;&lt;/a&gt;&lt;/span&gt;&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Photo by &lt;a class=&#34;link&#34; href=&#34;https://unsplash.com/@codioful&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Codioful&lt;/a&gt; on &lt;a class=&#34;link&#34; href=&#34;https://unsplash.com/photos/WDSN62Qdxuk&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        </item>
+        <item>
+        <title>Math Typesetting</title>
+        <link>http://localhost:1313/zh-cn/p/math-typesetting/</link>
+        <pubDate>Thu, 24 Aug 2023 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/math-typesetting/</guid>
+        <description>&lt;p&gt;Stack has built-in support for math typesetting using &lt;a class=&#34;link&#34; href=&#34;https://katex.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;KaTeX&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;It&amp;rsquo;s not enabled by default side-wide,&lt;/strong&gt; but you can enable it for individual posts by adding &lt;code&gt;math: true&lt;/code&gt; to the front matter. Or you can enable it side-wide by adding &lt;code&gt;math = true&lt;/code&gt; to the &lt;code&gt;params.article&lt;/code&gt; section in &lt;code&gt;config.toml&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;inline-math&#34;&gt;Inline math
+&lt;/h2&gt;&lt;p&gt;This is an inline mathematical expression: $\varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887…$&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$\varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887…$
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;block-math&#34;&gt;Block math
+&lt;/h2&gt;$$
+    \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } 
+$$&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$$
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$$
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;$$
+    f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
+$$&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$$
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$$
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        
+    </channel>
+</rss>

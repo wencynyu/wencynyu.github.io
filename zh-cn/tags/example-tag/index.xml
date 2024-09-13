@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Example Tag on wenxin-blog</title>
+        <link>http://localhost:1313/zh-cn/tags/example-tag/</link>
+        <description>Recent content in Example Tag on wenxin-blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>yuwenxin</copyright>
+        <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/example-tag/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Hello World</title>
+        <link>http://localhost:1313/zh-cn/p/hello-world/</link>
+        <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/hello-world/</guid>
+        <description>&lt;img src="http://localhost:1313/zh-cn/p/hello-world/cover.jpg" alt="Featured image of post Hello World" /&gt;&lt;h1 id=&#34;计算机网络&#34;&gt;计算机网络
+&lt;/h1&gt;&lt;p&gt;本文主要参考了谢希仁老师编著的《计算机网络》教材第七版，并且后续会更新本书的全部章节，帮助每个程序员新人来理解相关的概念。&lt;/p&gt;
+&lt;p&gt;文章中包含了许多体系化的知识以及相关的发展历史，个人认为据因寻果是一种非常有助于理解学习的内容，激发学习的兴趣的一种学习方法。希望能给各位同学们带来些许帮助。
+@&lt;a class=&#34;link&#34; href=&#34;%e6%96%87%e7%ab%a0%e7%9b%ae%e5%bd%95&#34; &gt;TOC&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;网络概述&#34;&gt;网络概述
+&lt;/h2&gt;&lt;p&gt;80后出生的许多人都被认为是生活在网络的时代，但其实，早在电报被广泛使用的二十世纪初，网络便渗透进了每个人的日常生活中。通信网络，使得每个人接收信息更加快速与便捷，直到计算机网络被广泛使用的现在，信息的透明度以及便捷度相较于非信息时代的时间里不可同日而语，现如今，某个明星早上出的八卦内容，在当天就能给某些企业的服务器带来巨大的流量压力；信息的快速传播也给此次的新型流感防疫工作带来了明显的帮助。如果你是相关专业的同学，阅读这篇文章能给你带来对网络的进一步理解，而非相关专业的同学也能收获一些通用的信息知识。&lt;/p&gt;
+&lt;h3 id=&#34;网络的分类&#34;&gt;网络的分类
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;电信网络&lt;/li&gt;
+&lt;li&gt;有线电视网络&lt;/li&gt;
+&lt;li&gt;计算机网络&lt;/li&gt;
+&lt;/ol&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;网络类型&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;主要应用&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;应用抽象&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;电信网络&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;电报，电话，传真&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;音频内容&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;有线电视网络&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;电视&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;视频内容&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;计算机网络&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;计算机（电脑）&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;多媒体内容，数据文件&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;理论上来讲，三种网络融合成一种带宽足够大的网络即可提供所有服务，但出于对经济以及行政方面的考量，这样的设想还是很难推进。不过在应用层面，已经有许多计算机（包含pc，手机等个人计算机设备）软件已经提供了基于计算机网络的视频或通信功能。&lt;/p&gt;
+&lt;h3 id=&#34;网络的性质&#34;&gt;网络的性质
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;连通性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用网络的两端用户之间，无论距离远近均能非常便捷，经济地交换各种信息，好像用户终端都彼此连通一般，故称其为连通性。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;共享性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;网络上的资源能够共享，并且网络上公开的资源就好像在用户身边一样便于使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;网络的这两种性质，基本概述了网络的基本功能：数据传输。
+不过网络对于数据传输的方法，却经历了大概3个时期：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;电路交换：整个报文的比特流连续的从源点直达终点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这是一种非常”古老“的数据传输方式，通常用于电信网络（电报电话）。
+它的工作流程大致如下：
+建立连接&amp;ndash;&amp;gt;通信&amp;ndash;&amp;gt;释放连接
+在整个通信期间，两个用户始终占用端到端的通信资源，这样虽然信息流传输速率比较快，但是将会导致通信成本非常高昂以及通信资源的大量浪费。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;报文交换：整个报文先传送到相邻节点，全部存储完成后查找转发表，转发到下一个节点，依次类推直到到达通信终点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这种传输方式解决了用户对端到端通信资源的持续占用，不过每次转发需要存储整个报文，必然会导致传输速率非常慢，延迟非常高，因此这是一种较不成熟的过渡传输方法。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;分组交换：报文分组后将单个分组传输到相邻节点，存储下来后查找转发表，转发到下一个节点，依次类推直到到达通信终点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在报文交换的基础上进行了分组，每次转发只需要存储一边单一分组即可，不同的划分也会影响到其传输性能，不过在研究者们的刻苦攻坚下，这个问题基本以及被解决，优秀的分组计划可以加快数据的传输，虽然速率可能比不过电路交换那种连续点到点的通信，不过通信资源占用量低，可以大大降低通信成本，让每个人都有参与网络使用的机会，加速网络的普及。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/195545dba34caa80bfb2e3496cee27d8.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;三种数据传输方式的图解&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;网络性能主要指标&#34;&gt;网络性能主要指标
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;速率
+单位：bps，bit per second，比特每秒&lt;/li&gt;
+&lt;li&gt;带宽（易混淆）
+带宽分为时域带宽与频域带宽
+频域带宽：电子信号所占据的频带宽度，单位Hz
+时域带宽：即最高速率，单位与速率相同，bps&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;我们现实生活中讨论的带宽通常是指时域带宽，例如你在电信公司办理了一个100M光前宽带，这里的100M就是100Mbps，换算为字节后要除以8（1Byte=8bit），也就成为了你下载的下行速率12.5MB/s。&lt;/p&gt;
+&lt;p&gt;而频域带宽，这里以5G移动网络信号为例：
+&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/b5872b08af779a5a4312cbeaa046a99a.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;5G频段-中国&#34;
+	
+	
+&gt;
+频域带宽就是电子信号所占据的频带宽度，不同的频域带宽，根据频率波长的关系，它的性能也往往有所差异，因此，有限的优秀频段往往成为一种竞争化的资源。这里再以5G移动网络信号为例：
+&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/50a1ce64c8f24fb7e5526aa7f10227d9.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;5G频段-全球&#34;
+	
+	
+&gt;
+这里不难看出，各国的频域带宽都是不同的，以避免信号之间的相互干扰，不过具体的频段优劣，涉及到国与国之间的内容，这里不做详述。&lt;/p&gt;
+&lt;p&gt;3.吞吐量（易混淆）
+吞吐量表示的是单位时间内实际传输的信号数量，因此，单位又是bps（惊不惊喜意不意外）。
+这里着重强调的是实际传输，因此这个参数也是一个能比较真实的反应你所使用的网络的性能的指标，它也往往会低于电信运营商所标识的额定时域带宽。&lt;/p&gt;
+&lt;h2 id=&#34;计算机网络互联网概述&#34;&gt;计算机网络（互联网）概述
+&lt;/h2&gt;&lt;p&gt;上面的内容还是对于所有网络这个宏观的概念进行讲解，下面进入计算机网络（后文简称计网）的概述内容。&lt;/p&gt;
+&lt;p&gt;在RFC[1208]中，规定了互联网（Internet）与互连网（internet）属于不同的概念，简单地说，互连网包含了互联网（实际中两者基本通用）。&lt;/p&gt;
+&lt;h3 id=&#34;计网的组成&#34;&gt;计网的组成
+&lt;/h3&gt;&lt;p&gt;计算机网络（网络）由若干个结点（非节点）和连接这些结点的链路所组成。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这里结点与节点的区分，个人理解为结点可以包含多个节点
+结点可以是由一个个微型的私人局域网，路由器，交换机等用以提供网络服务的host所构成&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这里所有接入互联网，由用户直接使用的主机被称为：互联网的&lt;strong&gt;边缘部分&lt;/strong&gt;
+大量网络和连接它们的路由器等为互联网的边缘部分提供服务的设施被称为：互联网的&lt;strong&gt;核心部分&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;计算机网络的组成部分中，最为核心的部件是&lt;strong&gt;路由器&lt;/strong&gt;，它是实现&lt;strong&gt;分组交换&lt;/strong&gt;的关键构件，任务是转发所有被其收到的数据包分组。&lt;/p&gt;
+&lt;h4 id=&#34;计网的通信架构&#34;&gt;计网的通信架构
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;C/S，client and server
+这里的client主要是向互联网申请各种服务的用户；
+server是在互联网范围内给用户提供实际服务的企业或个人。
+互联网的绝大多数应用都是基于此架构。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;P2P，peer to peer，也可以理解为person to person
+这里的每台主机既是客户端，又是服务端，相较于C/S架构使用量较少
+最典型的应用就是P2P下载应用，每台主机都可以作为内容的暂存者，当你需要下载某些数据时，可以优先找到能提供更快速率下载的peer直接下载，不需要每次都访问官方的server，极大的加快下载速率。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;计网的发展&#34;&gt;计网的发展
+&lt;/h3&gt;&lt;h4 id=&#34;一-单个网络arpanet向互联网发展实验阶段1969-1990&#34;&gt;一、 单个网络ARPANET向互联网发展（实验阶段：1969-1990）
+&lt;/h4&gt;&lt;p&gt;高级研究计划局网络（英语：Advanced Research Projects Agency Network），通称阿帕网（英语：ARPANET）是美国国防高级研究计划局开发的世界上第一个运营的数据包交换网络，是全球互联网的鼻祖。&lt;/p&gt;
+&lt;p&gt;最初，arpanet只是一个单个的分组交换网，并非是一个互连的网络，随着时间的发展，通信需求的增加带来了许多通信协议的诞生，这些通信协议又有利于更高级的协议编写，慢慢地，由TCP/IP协议族（20世纪80年代，有心的同学可以结合计算机在这个时期的发展来进行更深度的思考）为主导的互联网开始显露出来。 &amp;ndash;wiki百科&lt;/p&gt;
+&lt;h4 id=&#34;二三级结构的互联网雏形科研阶段21世纪初期&#34;&gt;二、三级结构的互联网雏形（科研阶段：21世纪初期）
+&lt;/h4&gt;&lt;p&gt;主干网络-&amp;gt;地区网络-&amp;gt;校园/企业网络&lt;/p&gt;
+&lt;h4 id=&#34;三多层次isp结构的互联网实用阶段现在&#34;&gt;三、多层次ISP结构的互联网（实用阶段：现在）
+&lt;/h4&gt;&lt;p&gt;名词解释ISP：Internet Service Provider，互联网服务提供商，也就是我们国家的电信运营商（电信，移动等），基本上所有的网络服务（主干网）都是由他们建造并提供相应的服务。&lt;/p&gt;
+&lt;p&gt;主干ISP-&amp;gt;地区ISP-&amp;gt;企业网络/本地ISP-&amp;gt;个人网络&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/93ab11f7878e48245148ae6f15d43707.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;多层次ISP互联网图解&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;计网的标准化工作流程&#34;&gt;计网的标准化工作流程
+&lt;/h4&gt;&lt;p&gt;组织：IETF，互联网工程部；IETF，互联网研究部&lt;/p&gt;
+&lt;h5 id=&#34;三大阶段由先到后&#34;&gt;三大阶段（由先到后）
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;互联网草案（每个草案大约保存6个月）&lt;/li&gt;
+&lt;li&gt;互联网建议标准（录入至RFC文档）&lt;/li&gt;
+&lt;li&gt;互联网标准（多个RFC文档的关联）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;计网体系结构重点&#34;&gt;计网体系结构（重点）
+&lt;/h3&gt;&lt;p&gt;仅仅有物理通路用以传输数据对于计算机之间还远远不够，面对计算机之间的通信，还需要处理以下几个问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;激活物理通路&lt;/li&gt;
+&lt;li&gt;识别接收对象&lt;/li&gt;
+&lt;li&gt;检测网络连接正常&lt;/li&gt;
+&lt;li&gt;审核准备工作&lt;/li&gt;
+&lt;li&gt;数据格式转换&lt;/li&gt;
+&lt;li&gt;出错备案&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;ARPANET提出了”分层”的方法，这些问题在后面的各个网络协议中被分别解决。&lt;/p&gt;
+&lt;h4 id=&#34;网络协议&#34;&gt;网络协议
+&lt;/h4&gt;&lt;p&gt;osi七层网络模型中，每一层的实现都有相对应的网络协议。
+包含但不限于：ARP，RARP，IPv4/v6，TCP，HTTP，FTP，SMTP，SSL等协议
+这些协议通常扮演者一个统一化的角色，因此我们需要了解网络协议的相关概念。&lt;/p&gt;
+&lt;h5 id=&#34;定义&#34;&gt;定义
+&lt;/h5&gt;&lt;p&gt;为进行网络中的数据交换而建立的规则，标准，或约定被称为网络协议。（==》这些内容规定了传输的数据格式及有关的同步问题。）&lt;/p&gt;
+&lt;h5 id=&#34;三要素&#34;&gt;三要素
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;语法：数据与控制信息的结构或格式&lt;/li&gt;
+&lt;li&gt;语义：控制及响应信息&lt;/li&gt;
+&lt;li&gt;同步：事件实现的详细说明&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;另：单机程序可以不需要任何网络协议的参与，例如一个简单的hello world程序。&lt;/p&gt;
+&lt;h4 id=&#34;网络模型&#34;&gt;&lt;strong&gt;网络模型&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;&lt;img src=&#34;https://i-blog.csdnimg.cn/blog_migrate/1c07347bc88391d073ad2f619426f3cc.jpeg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;网络模型&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;tcpip模型&#34;&gt;tcp/ip模型
+&lt;/h5&gt;&lt;p&gt;这是使用最为广泛的一个网络模型&lt;/p&gt;
+&lt;h5 id=&#34;osi七层模型&#34;&gt;osi七层模型
+&lt;/h5&gt;&lt;p&gt;这是最官方的一个网络模型&lt;/p&gt;
+&lt;h5 id=&#34;tcpip五层网络模型&#34;&gt;tcp/ip五层网络模型
+&lt;/h5&gt;&lt;p&gt;这是一个折中的网络模型&lt;/p&gt;
+&lt;p&gt;tcp/ip模型中的网络接口被拆分为物理层与数据链路层。&lt;/p&gt;
+&lt;h5 id=&#34;网络模型中的数据传输内容以osi模型为例&#34;&gt;网络模型中的数据传输内容（以osi模型为例）
+&lt;/h5&gt;&lt;p&gt;除物理层中传输的为&lt;strong&gt;比特流&lt;/strong&gt;以外，其他各层都以&lt;strong&gt;数据包&lt;/strong&gt;的形式来传输数据（&lt;strong&gt;数据包~=数据头部header+数据内容&lt;/strong&gt;）。&lt;/p&gt;
+&lt;p&gt;数据头部在每个网络协议中都有不同的规定，根据这些规定加上相关的算法，就可以解决上文提到的，计算机网络传输数据还需要处理的几个问题。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;激活物理通路&lt;/li&gt;
+&lt;li&gt;识别接收对象&lt;/li&gt;
+&lt;li&gt;检测网络连接正常&lt;/li&gt;
+&lt;li&gt;审核准备工作&lt;/li&gt;
+&lt;li&gt;数据格式转换&lt;/li&gt;
+&lt;li&gt;出错备案&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
