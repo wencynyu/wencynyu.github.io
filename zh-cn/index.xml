@@ -8,6 +8,239 @@
         <language>zh-cn</language>
         <copyright>yuwenxin</copyright>
         <lastBuildDate>Sat, 14 Sep 2024 02:06:14 +0800</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>神经网络</title>
+        <link>https://wencynyu.github.io/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
+        
+        <guid>https://wencynyu.github.io/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <description>&lt;h2 id=&#34;数学基础&#34;&gt;数学基础：
+&lt;/h2&gt;&lt;p&gt;高等数学：导数、微分、偏导数（多元函数导数）&lt;/p&gt;
+&lt;p&gt;线性代数：向量、行列式、矩阵的基本运算、秩&lt;/p&gt;
+&lt;h2 id=&#34;高等数学&#34;&gt;高等数学
+&lt;/h2&gt;&lt;h3 id=&#34;导数&#34;&gt;导数
+&lt;/h3&gt;\[
+f&#39;(x_0) = \frac{dy}{dx} = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} 
+\]&lt;h3 id=&#34;极限&#34;&gt;极限
+&lt;/h3&gt;&lt;p&gt;ε δ 语言：
+函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\epsilon &amp;gt; 0$，都存在 $\delta &amp;gt; 0$，使得在 $0 &amp;lt; |x - x_0| &amp;lt; \delta$ 时，不等式 $|f(x) - a| &amp;lt; \epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \to x_0$ 时的极限，记作：
+&lt;/p&gt;
+$$
+\lim_{x \to x_0} f(x) = a
+$$&lt;h3 id=&#34;微分&#34;&gt;微分
+&lt;/h3&gt;&lt;p&gt;函数变化量 = 变化率 * 参数变化量
+&lt;/p&gt;
+$$
+df(x) = f&#39;(x) \, dx
+$$&lt;h3 id=&#34;偏导&#34;&gt;偏导
+&lt;/h3&gt;&lt;p&gt;对于一个多元函数 $f(x_1, x_2, \ldots, x_n)$，它在点 $(x_1^0, x_2^0, \ldots, x_n^0)$ 处的偏导数相对于 $x_i$ 是：
+&lt;/p&gt;
+$$
+\frac{\partial f}{\partial x_i} = \lim_{h \to 0} \frac{f(x_1^0, \ldots, x_i^0 + h, \ldots, x_n^0) - f(x_1^0, \ldots, x_i^0, \ldots, x_n^0)}{h}
+$$&lt;h3 id=&#34;偏导的链式法则&#34;&gt;偏导的链式法则
+&lt;/h3&gt;&lt;p&gt;假设我们有两个函数 $u = g(x_1, x_2, \ldots, x_n)$ 和 $y = f(u)$，其中 $u$ 是 $x_1, x_2, \ldots, x_n$ 的函数，而 $y$ 是 $u$ 的函数。我们希望找到 $y$ 对 $x_i$ 的偏导数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;链式法则&lt;/strong&gt;的定义是：&lt;/p&gt;
+$$
+\frac{\partial y}{\partial x_i} = \frac{\partial y}{\partial u} \cdot \frac{\partial u}{\partial x_i}
+$$&lt;p&gt;其中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$\frac{\partial y}{\partial u}$ 是 $y$ 对 $u$ 的偏导数。&lt;/li&gt;
+&lt;li&gt;$\frac{\partial u}{\partial x_i}$ 是 $u$ 对 $x_i$ 的偏导数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;证明&#34;&gt;证明
+&lt;/h4&gt;&lt;p&gt;全微分关系为：
+&lt;/p&gt;
+$$ dz = \frac{\partial z}{\partial u} \, du + \frac{\partial z}{\partial v} \, dv $$&lt;p&gt;由于 $u$ 和 $v$ 是 $x$ 和 $y$ 的函数，我们有：
+&lt;/p&gt;
+$$ du = \frac{\partial u}{\partial x} \, dx + \frac{\partial u}{\partial y} \, dy $$$$ dv = \frac{\partial v}{\partial x} \, dx + \frac{\partial v}{\partial y} \, dy $$&lt;p&gt;将这些代入全微分公式中，得到：
+&lt;/p&gt;
+$$ dz = \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} \right) dx + \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} \right) dy $$&lt;h4 id=&#34;链式法则的偏导数&#34;&gt;链式法则的偏导数
+&lt;/h4&gt;&lt;p&gt;根据全微分关系，链式法则的偏导数为：
+&lt;/p&gt;
+$$ \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} $$$$ \frac{\partial z}{\partial y} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} $$&lt;h2 id=&#34;线性代数&#34;&gt;线性代数
+&lt;/h2&gt;&lt;h3 id=&#34;向量的定义&#34;&gt;向量的定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;向量&lt;/strong&gt;是一个具有大小和方向的量，通常在多维空间中表示为一个有序的数列。一个 $n$ 维向量可以写作：&lt;/p&gt;
+$$
+\mathbf{v} = \begin{bmatrix}
+v_1 \\
+v_2 \\
+\vdots \\
+v_n
+\end{bmatrix}
+$$&lt;h3 id=&#34;行列式的定义&#34;&gt;行列式的定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;行列式&lt;/strong&gt;是一个方阵的一个标量值，它可以用来描述矩阵的某些性质，比如可逆性。对于一个 $n \times n$ 的方阵 $A$，行列式记作 $\det(A)$ 或 $|A|$，可以表示为：&lt;/p&gt;
+&lt;p&gt;对于 $2 \times 2$ 矩阵：&lt;/p&gt;
+$$
+\det \begin{pmatrix}
+a &amp; b \\
+c &amp; d
+\end{pmatrix} = ad - bc
+$$&lt;p&gt;对于 $3 \times 3$ 矩阵：&lt;/p&gt;
+$$
+\det \begin{pmatrix}
+a &amp; b &amp; c \\
+d &amp; e &amp; f \\
+g &amp; h &amp; i
+\end{pmatrix} = aei + bfg + cdh - ceg - bdi - afh
+$$&lt;h3 id=&#34;矩阵的定义&#34;&gt;矩阵的定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;矩阵&lt;/strong&gt;是一个按照矩形阵列排列的数值集合。一个 $m \times n$ 的矩阵可以表示为：&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
+a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{m1} &amp; a_{m2} &amp; \cdots &amp; a_{mn}
+\end{bmatrix}
+$$&lt;h3 id=&#34;矩阵的基本运算&#34;&gt;矩阵的基本运算
+&lt;/h3&gt;&lt;h4 id=&#34;1-矩阵加法&#34;&gt;1. 矩阵加法
+&lt;/h4&gt;&lt;p&gt;两个同型矩阵 $A$ 和 $B$ 的加法是元素对应相加，得到的新矩阵为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$$$
+B = \begin{bmatrix}
+b_{11} &amp; b_{12} \\
+b_{21} &amp; b_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+A + B = \begin{bmatrix}
+a_{11} + b_{11} &amp; a_{12} + b_{12} \\
+a_{21} + b_{21} &amp; a_{22} + b_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;2-矩阵减法&#34;&gt;2. 矩阵减法
+&lt;/h4&gt;&lt;p&gt;两个同型矩阵 $A$ 和 $B$ 的减法是元素对应相减，得到的新矩阵为：
+&lt;/p&gt;
+$$
+A - B = \begin{bmatrix}
+a_{11} - b_{11} &amp; a_{12} - b_{12} \\
+a_{21} - b_{21} &amp; a_{22} - b_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;3-矩阵数乘&#34;&gt;3. 矩阵数乘
+&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 与标量 $k$ 的数乘是矩阵中每个元素都乘以 $k$，得到的新矩阵为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+kA = \begin{bmatrix}
+ka_{11} &amp; ka_{12} \\
+ka_{21} &amp; ka_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;4-矩阵乘法&#34;&gt;4. 矩阵乘法
+&lt;/h4&gt;&lt;p&gt;两个矩阵 $A$ 和 $B$ 的乘法是矩阵 $A$ 的行向量与矩阵 $B$ 的列向量的内积，得到的新矩阵 $C$ 为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$$$
+B = \begin{bmatrix}
+b_{11} &amp; b_{12} \\
+b_{21} &amp; b_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+C = AB = \begin{bmatrix}
+a_{11}b_{11} + a_{12}b_{21} &amp; a_{11}b_{12} + a_{12}b_{22} \\
+a_{21}b_{11} + a_{22}b_{21} &amp; a_{21}b_{12} + a_{22}b_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;5-矩阵转置&#34;&gt;5. 矩阵转置
+&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 的转置是将矩阵 $A$ 的行和列互换得到的新矩阵 $A^T$：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+A^T = \begin{bmatrix}
+a_{11} &amp; a_{21} \\
+a_{12} &amp; a_{22}
+\end{bmatrix}
+$$&lt;h4 id=&#34;6-矩阵的逆&#34;&gt;6. 矩阵的逆
+&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 的逆矩阵 $A^{-1}$ 是使得 $AA^{-1} = A^{-1}A = I$ 的矩阵，其中 $I$ 是单位矩阵。对于 $2 \times 2$ 矩阵 $A$，如果行列式 $\det(A) \neq 0$，其逆矩阵为：
+如果
+&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+a &amp; b \\
+c &amp; d
+\end{bmatrix}
+$$&lt;p&gt;
+那么
+&lt;/p&gt;
+$$
+A^{-1} = \frac{1}{\det(A)} \begin{bmatrix}
+d &amp; -b \\
+-c &amp; a
+\end{bmatrix}
+$$&lt;p&gt;
+其中行列式 $\det(A)$ 为：
+&lt;/p&gt;
+$$
+\det(A) = ad - bc
+$$&lt;h4 id=&#34;7-矩阵的秩&#34;&gt;7. 矩阵的秩
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;矩阵的秩&lt;/strong&gt;（rank）是矩阵中线性无关的行（或列）的最大数量。矩阵的秩可以用来判断矩阵的行或列的线性独立性。&lt;/p&gt;
+&lt;p&gt;对于一个 $m \times n$ 的矩阵 $A$，秩定义为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;矩阵 $A$ 的&lt;strong&gt;行秩&lt;/strong&gt;：矩阵 $A$ 的最大线性无关的行的数量。&lt;/li&gt;
+&lt;li&gt;矩阵 $A$ 的&lt;strong&gt;列秩&lt;/strong&gt;：矩阵 $A$ 的最大线性无关的列的数量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;行秩和列秩总是相等，这个公共值称为矩阵的秩，记作 $\text{rank}(A)$。&lt;/p&gt;
+&lt;h4 id=&#34;举例&#34;&gt;举例
+&lt;/h4&gt;&lt;p&gt;假设有一个矩阵 $A$：&lt;/p&gt;
+$$
+A = \begin{bmatrix}
+1 &amp; 2 &amp; 3 \\
+4 &amp; 5 &amp; 6 \\
+7 &amp; 8 &amp; 9
+\end{bmatrix}
+$$&lt;p&gt;矩阵 $A$ 的秩是 $2$，因为矩阵的行或列中最大数量的线性无关的行或列是 $2$。&lt;/p&gt;
+&lt;h5 id=&#34;步骤&#34;&gt;步骤
+&lt;/h5&gt;&lt;p&gt;r2 = r2 - 4*r1&lt;/p&gt;
+&lt;p&gt;r3 = r3 - 7*r1&lt;/p&gt;
+&lt;p&gt;r2 = -1/3*r2&lt;/p&gt;
+&lt;p&gt;r3 = r3 + 6*r2&lt;/p&gt;
+&lt;h2 id=&#34;机器学习基本概念&#34;&gt;机器学习基本概念
+&lt;/h2&gt;&lt;h3 id=&#34;ml类别&#34;&gt;ml类别
+&lt;/h3&gt;&lt;h4 id=&#34;监督学习&#34;&gt;监督学习
+&lt;/h4&gt;&lt;p&gt;有数据标注的机器学习&lt;/p&gt;
+&lt;h5 id=&#34;分类问题&#34;&gt;分类问题
+&lt;/h5&gt;&lt;p&gt;给出X样本，以及样本中每一行对应的标注结果集Y&lt;/p&gt;
+&lt;p&gt;根据样本特征，预测新样本的结果&lt;/p&gt;
+&lt;h5 id=&#34;回归问题&#34;&gt;回归问题
+&lt;/h5&gt;&lt;p&gt;给出X样本，以及样本中每一行对应的标注结果集Y&lt;/p&gt;
+&lt;p&gt;根据样本特征，预测新样本的趋势&lt;/p&gt;
+&lt;h4 id=&#34;无监督学习&#34;&gt;无监督学习
+&lt;/h4&gt;&lt;p&gt;无数据标注的机器学习&lt;/p&gt;
+&lt;h5 id=&#34;聚类问题&#34;&gt;聚类问题
+&lt;/h5&gt;&lt;p&gt;仅给出X样本&lt;/p&gt;
+&lt;p&gt;通过算法划分出不同的类别。&lt;/p&gt;
+&lt;h3 id=&#34;注&#34;&gt;注：
+&lt;/h3&gt;&lt;p&gt;大多数机器学习应用多属于监督学习，后续仅对knn聚类算法做了简单介绍，其他算法均为监督学习。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>计算机网络基本发展</title>
         <link>https://wencynyu.github.io/zh-cn/p/hello-world/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
@@ -239,239 +472,6 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
 &lt;li&gt;数据格式转换&lt;/li&gt;
 &lt;li&gt;出错备案&lt;/li&gt;
 &lt;/ol&gt;
-</description>
-        </item>
-        <item>
-        <title>神经网络</title>
-        <link>https://wencynyu.github.io/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
-        <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
-        
-        <guid>https://wencynyu.github.io/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
-        <description>&lt;h2 id=&#34;数学基础&#34;&gt;数学基础：
-&lt;/h2&gt;&lt;p&gt;高等数学：导数、微分、偏导数（多元函数导数）&lt;/p&gt;
-&lt;p&gt;线性代数：向量、行列式、矩阵的基本运算、秩&lt;/p&gt;
-&lt;h2 id=&#34;高等数学&#34;&gt;高等数学
-&lt;/h2&gt;&lt;h3 id=&#34;导数&#34;&gt;导数
-&lt;/h3&gt;\[
-f&#39;(x_0) = \frac{dy}{dx} = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} 
-\]&lt;h3 id=&#34;极限&#34;&gt;极限
-&lt;/h3&gt;&lt;p&gt;ε δ 语言：
-函数 $f(x)$ 在点 $x_0$ 的某一去心邻域内有定义。如果存在常数 $a$，对于任意的 $\epsilon &amp;gt; 0$，都存在 $\delta &amp;gt; 0$，使得在 $0 &amp;lt; |x - x_0| &amp;lt; \delta$ 时，不等式 $|f(x) - a| &amp;lt; \epsilon$ 恒成立。那么常数 $a$ 就叫做函数 $f(x)$ 当 $x \to x_0$ 时的极限，记作：
-&lt;/p&gt;
-$$
-\lim_{x \to x_0} f(x) = a
-$$&lt;h3 id=&#34;微分&#34;&gt;微分
-&lt;/h3&gt;&lt;p&gt;函数变化量 = 变化率 * 参数变化量
-&lt;/p&gt;
-$$
-df(x) = f&#39;(x) \, dx
-$$&lt;h3 id=&#34;偏导&#34;&gt;偏导
-&lt;/h3&gt;&lt;p&gt;对于一个多元函数 $f(x_1, x_2, \ldots, x_n)$，它在点 $(x_1^0, x_2^0, \ldots, x_n^0)$ 处的偏导数相对于 $x_i$ 是：
-&lt;/p&gt;
-$$
-\frac{\partial f}{\partial x_i} = \lim_{h \to 0} \frac{f(x_1^0, \ldots, x_i^0 + h, \ldots, x_n^0) - f(x_1^0, \ldots, x_i^0, \ldots, x_n^0)}{h}
-$$&lt;h3 id=&#34;偏导的链式法则&#34;&gt;偏导的链式法则
-&lt;/h3&gt;&lt;p&gt;假设我们有两个函数 $u = g(x_1, x_2, \ldots, x_n)$ 和 $y = f(u)$，其中 $u$ 是 $x_1, x_2, \ldots, x_n$ 的函数，而 $y$ 是 $u$ 的函数。我们希望找到 $y$ 对 $x_i$ 的偏导数。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;链式法则&lt;/strong&gt;的定义是：&lt;/p&gt;
-$$
-\frac{\partial y}{\partial x_i} = \frac{\partial y}{\partial u} \cdot \frac{\partial u}{\partial x_i}
-$$&lt;p&gt;其中：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;$\frac{\partial y}{\partial u}$ 是 $y$ 对 $u$ 的偏导数。&lt;/li&gt;
-&lt;li&gt;$\frac{\partial u}{\partial x_i}$ 是 $u$ 对 $x_i$ 的偏导数。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;证明&#34;&gt;证明
-&lt;/h4&gt;&lt;p&gt;全微分关系为：
-&lt;/p&gt;
-$$ dz = \frac{\partial z}{\partial u} \, du + \frac{\partial z}{\partial v} \, dv $$&lt;p&gt;由于 $u$ 和 $v$ 是 $x$ 和 $y$ 的函数，我们有：
-&lt;/p&gt;
-$$ du = \frac{\partial u}{\partial x} \, dx + \frac{\partial u}{\partial y} \, dy $$$$ dv = \frac{\partial v}{\partial x} \, dx + \frac{\partial v}{\partial y} \, dy $$&lt;p&gt;将这些代入全微分公式中，得到：
-&lt;/p&gt;
-$$ dz = \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} \right) dx + \left( \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} \right) dy $$&lt;h4 id=&#34;链式法则的偏导数&#34;&gt;链式法则的偏导数
-&lt;/h4&gt;&lt;p&gt;根据全微分关系，链式法则的偏导数为：
-&lt;/p&gt;
-$$ \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial x} $$$$ \frac{\partial z}{\partial y} = \frac{\partial z}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \frac{\partial v}{\partial y} $$&lt;h2 id=&#34;线性代数&#34;&gt;线性代数
-&lt;/h2&gt;&lt;h3 id=&#34;向量的定义&#34;&gt;向量的定义
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;向量&lt;/strong&gt;是一个具有大小和方向的量，通常在多维空间中表示为一个有序的数列。一个 $n$ 维向量可以写作：&lt;/p&gt;
-$$
-\mathbf{v} = \begin{bmatrix}
-v_1 \\
-v_2 \\
-\vdots \\
-v_n
-\end{bmatrix}
-$$&lt;h3 id=&#34;行列式的定义&#34;&gt;行列式的定义
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;行列式&lt;/strong&gt;是一个方阵的一个标量值，它可以用来描述矩阵的某些性质，比如可逆性。对于一个 $n \times n$ 的方阵 $A$，行列式记作 $\det(A)$ 或 $|A|$，可以表示为：&lt;/p&gt;
-&lt;p&gt;对于 $2 \times 2$ 矩阵：&lt;/p&gt;
-$$
-\det \begin{pmatrix}
-a &amp; b \\
-c &amp; d
-\end{pmatrix} = ad - bc
-$$&lt;p&gt;对于 $3 \times 3$ 矩阵：&lt;/p&gt;
-$$
-\det \begin{pmatrix}
-a &amp; b &amp; c \\
-d &amp; e &amp; f \\
-g &amp; h &amp; i
-\end{pmatrix} = aei + bfg + cdh - ceg - bdi - afh
-$$&lt;h3 id=&#34;矩阵的定义&#34;&gt;矩阵的定义
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;矩阵&lt;/strong&gt;是一个按照矩形阵列排列的数值集合。一个 $m \times n$ 的矩阵可以表示为：&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
-a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
-\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-a_{m1} &amp; a_{m2} &amp; \cdots &amp; a_{mn}
-\end{bmatrix}
-$$&lt;h3 id=&#34;矩阵的基本运算&#34;&gt;矩阵的基本运算
-&lt;/h3&gt;&lt;h4 id=&#34;1-矩阵加法&#34;&gt;1. 矩阵加法
-&lt;/h4&gt;&lt;p&gt;两个同型矩阵 $A$ 和 $B$ 的加法是元素对应相加，得到的新矩阵为：
-如果
-&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-a_{11} &amp; a_{12} \\
-a_{21} &amp; a_{22}
-\end{bmatrix}
-$$$$
-B = \begin{bmatrix}
-b_{11} &amp; b_{12} \\
-b_{21} &amp; b_{22}
-\end{bmatrix}
-$$&lt;p&gt;
-那么
-&lt;/p&gt;
-$$
-A + B = \begin{bmatrix}
-a_{11} + b_{11} &amp; a_{12} + b_{12} \\
-a_{21} + b_{21} &amp; a_{22} + b_{22}
-\end{bmatrix}
-$$&lt;h4 id=&#34;2-矩阵减法&#34;&gt;2. 矩阵减法
-&lt;/h4&gt;&lt;p&gt;两个同型矩阵 $A$ 和 $B$ 的减法是元素对应相减，得到的新矩阵为：
-&lt;/p&gt;
-$$
-A - B = \begin{bmatrix}
-a_{11} - b_{11} &amp; a_{12} - b_{12} \\
-a_{21} - b_{21} &amp; a_{22} - b_{22}
-\end{bmatrix}
-$$&lt;h4 id=&#34;3-矩阵数乘&#34;&gt;3. 矩阵数乘
-&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 与标量 $k$ 的数乘是矩阵中每个元素都乘以 $k$，得到的新矩阵为：
-如果
-&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-a_{11} &amp; a_{12} \\
-a_{21} &amp; a_{22}
-\end{bmatrix}
-$$&lt;p&gt;
-那么
-&lt;/p&gt;
-$$
-kA = \begin{bmatrix}
-ka_{11} &amp; ka_{12} \\
-ka_{21} &amp; ka_{22}
-\end{bmatrix}
-$$&lt;h4 id=&#34;4-矩阵乘法&#34;&gt;4. 矩阵乘法
-&lt;/h4&gt;&lt;p&gt;两个矩阵 $A$ 和 $B$ 的乘法是矩阵 $A$ 的行向量与矩阵 $B$ 的列向量的内积，得到的新矩阵 $C$ 为：
-如果
-&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-a_{11} &amp; a_{12} \\
-a_{21} &amp; a_{22}
-\end{bmatrix}
-$$$$
-B = \begin{bmatrix}
-b_{11} &amp; b_{12} \\
-b_{21} &amp; b_{22}
-\end{bmatrix}
-$$&lt;p&gt;
-那么
-&lt;/p&gt;
-$$
-C = AB = \begin{bmatrix}
-a_{11}b_{11} + a_{12}b_{21} &amp; a_{11}b_{12} + a_{12}b_{22} \\
-a_{21}b_{11} + a_{22}b_{21} &amp; a_{21}b_{12} + a_{22}b_{22}
-\end{bmatrix}
-$$&lt;h4 id=&#34;5-矩阵转置&#34;&gt;5. 矩阵转置
-&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 的转置是将矩阵 $A$ 的行和列互换得到的新矩阵 $A^T$：
-如果
-&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-a_{11} &amp; a_{12} \\
-a_{21} &amp; a_{22}
-\end{bmatrix}
-$$&lt;p&gt;
-那么
-&lt;/p&gt;
-$$
-A^T = \begin{bmatrix}
-a_{11} &amp; a_{21} \\
-a_{12} &amp; a_{22}
-\end{bmatrix}
-$$&lt;h4 id=&#34;6-矩阵的逆&#34;&gt;6. 矩阵的逆
-&lt;/h4&gt;&lt;p&gt;矩阵 $A$ 的逆矩阵 $A^{-1}$ 是使得 $AA^{-1} = A^{-1}A = I$ 的矩阵，其中 $I$ 是单位矩阵。对于 $2 \times 2$ 矩阵 $A$，如果行列式 $\det(A) \neq 0$，其逆矩阵为：
-如果
-&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-a &amp; b \\
-c &amp; d
-\end{bmatrix}
-$$&lt;p&gt;
-那么
-&lt;/p&gt;
-$$
-A^{-1} = \frac{1}{\det(A)} \begin{bmatrix}
-d &amp; -b \\
--c &amp; a
-\end{bmatrix}
-$$&lt;p&gt;
-其中行列式 $\det(A)$ 为：
-&lt;/p&gt;
-$$
-\det(A) = ad - bc
-$$&lt;h4 id=&#34;7-矩阵的秩&#34;&gt;7. 矩阵的秩
-&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;矩阵的秩&lt;/strong&gt;（rank）是矩阵中线性无关的行（或列）的最大数量。矩阵的秩可以用来判断矩阵的行或列的线性独立性。&lt;/p&gt;
-&lt;p&gt;对于一个 $m \times n$ 的矩阵 $A$，秩定义为：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;矩阵 $A$ 的&lt;strong&gt;行秩&lt;/strong&gt;：矩阵 $A$ 的最大线性无关的行的数量。&lt;/li&gt;
-&lt;li&gt;矩阵 $A$ 的&lt;strong&gt;列秩&lt;/strong&gt;：矩阵 $A$ 的最大线性无关的列的数量。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;行秩和列秩总是相等，这个公共值称为矩阵的秩，记作 $\text{rank}(A)$。&lt;/p&gt;
-&lt;h4 id=&#34;举例&#34;&gt;举例
-&lt;/h4&gt;&lt;p&gt;假设有一个矩阵 $A$：&lt;/p&gt;
-$$
-A = \begin{bmatrix}
-1 &amp; 2 &amp; 3 \\
-4 &amp; 5 &amp; 6 \\
-7 &amp; 8 &amp; 9
-\end{bmatrix}
-$$&lt;p&gt;矩阵 $A$ 的秩是 $2$，因为矩阵的行或列中最大数量的线性无关的行或列是 $2$。&lt;/p&gt;
-&lt;h5 id=&#34;步骤&#34;&gt;步骤
-&lt;/h5&gt;&lt;p&gt;r2 = r2 - 4*r1&lt;/p&gt;
-&lt;p&gt;r3 = r3 - 7*r1&lt;/p&gt;
-&lt;p&gt;r2 = -1/3*r2&lt;/p&gt;
-&lt;p&gt;r3 = r3 + 6*r2&lt;/p&gt;
-&lt;h2 id=&#34;机器学习基本概念&#34;&gt;机器学习基本概念
-&lt;/h2&gt;&lt;h3 id=&#34;ml类别&#34;&gt;ml类别
-&lt;/h3&gt;&lt;h4 id=&#34;监督学习&#34;&gt;监督学习
-&lt;/h4&gt;&lt;p&gt;有数据标注的机器学习&lt;/p&gt;
-&lt;h5 id=&#34;分类问题&#34;&gt;分类问题
-&lt;/h5&gt;&lt;p&gt;给出X样本，以及样本中每一行对应的标注结果集Y&lt;/p&gt;
-&lt;p&gt;根据样本特征，预测新样本的结果&lt;/p&gt;
-&lt;h5 id=&#34;回归问题&#34;&gt;回归问题
-&lt;/h5&gt;&lt;p&gt;给出X样本，以及样本中每一行对应的标注结果集Y&lt;/p&gt;
-&lt;p&gt;根据样本特征，预测新样本的趋势&lt;/p&gt;
-&lt;h4 id=&#34;无监督学习&#34;&gt;无监督学习
-&lt;/h4&gt;&lt;p&gt;无数据标注的机器学习&lt;/p&gt;
-&lt;h5 id=&#34;聚类问题&#34;&gt;聚类问题
-&lt;/h5&gt;&lt;p&gt;仅给出X样本&lt;/p&gt;
-&lt;p&gt;通过算法划分出不同的类别。&lt;/p&gt;
-&lt;h3 id=&#34;注&#34;&gt;注：
-&lt;/h3&gt;&lt;p&gt;大多数机器学习应用多属于监督学习，后续仅对knn聚类算法做了简单介绍，其他算法均为监督学习。&lt;/p&gt;
 </description>
         </item>
         <item>
