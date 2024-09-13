@@ -8,15 +8,14 @@
         <language>zh-cn</language>
         <copyright>yuwenxin</copyright>
         <lastBuildDate>Thu, 07 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Hello World</title>
+        <title>计算机网络基本发展</title>
         <link>https://wencynyu.github.io/zh-cn/p/hello-world/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
         
         <guid>https://wencynyu.github.io/zh-cn/p/hello-world/</guid>
-        <description>&lt;img src="https://wencynyu.github.io/zh-cn/p/hello-world/cover.jpg" alt="Featured image of post Hello World" /&gt;&lt;h1 id=&#34;计算机网络&#34;&gt;计算机网络
+        <description>&lt;img src="https://wencynyu.github.io/zh-cn/p/hello-world/cover.jpg" alt="Featured image of post 计算机网络基本发展" /&gt;&lt;h1 id=&#34;计算机网络&#34;&gt;计算机网络
 &lt;/h1&gt;&lt;p&gt;本文主要参考了谢希仁老师编著的《计算机网络》教材第七版，并且后续会更新本书的全部章节，帮助每个程序员新人来理解相关的概念。&lt;/p&gt;
-&lt;p&gt;文章中包含了许多体系化的知识以及相关的发展历史，个人认为据因寻果是一种非常有助于理解学习的内容，激发学习的兴趣的一种学习方法。希望能给各位同学们带来些许帮助。
-@&lt;a class=&#34;link&#34; href=&#34;%e6%96%87%e7%ab%a0%e7%9b%ae%e5%bd%95&#34; &gt;TOC&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;文章中包含了许多体系化的知识以及相关的发展历史，个人认为据因寻果是一种非常有助于理解学习的内容，激发学习的兴趣的一种学习方法。希望能给各位同学们带来些许帮助。&lt;/p&gt;
 &lt;h2 id=&#34;网络概述&#34;&gt;网络概述
 &lt;/h2&gt;&lt;p&gt;80后出生的许多人都被认为是生活在网络的时代，但其实，早在电报被广泛使用的二十世纪初，网络便渗透进了每个人的日常生活中。通信网络，使得每个人接收信息更加快速与便捷，直到计算机网络被广泛使用的现在，信息的透明度以及便捷度相较于非信息时代的时间里不可同日而语，现如今，某个明星早上出的八卦内容，在当天就能给某些企业的服务器带来巨大的流量压力；信息的快速传播也给此次的新型流感防疫工作带来了明显的帮助。如果你是相关专业的同学，阅读这篇文章能给你带来对网络的进一步理解，而非相关专业的同学也能收获一些通用的信息知识。&lt;/p&gt;
 &lt;h3 id=&#34;网络的分类&#34;&gt;网络的分类
