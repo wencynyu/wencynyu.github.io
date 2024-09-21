@@ -277,6 +277,7 @@
         <li><a href="#流程">流程</a>
           <ol>
             <li><a href="#优化器---实操理解">优化器 - 实操理解</a></li>
+            <li><a href="#mysql优化经典操作--实现源码">MySQL优化经典操作 &amp; 实现源码</a></li>
           </ol>
         </li>
         <li><a href="#存储引擎索引">存储引擎（索引）</a>
@@ -361,7 +362,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 4 分钟
+                    阅读时长: 10 分钟
                 </time>
             </div>
         
@@ -381,7 +382,10 @@
 <li>关系型（行存储）</li>
 <li>持久化（硬盘/外存）</li>
 <li>事务支持（ACID）</li>
+<li>OLTP（on-line transaction processing）</li>
 </ul>
+<p>通常用于主业务侧场景，例如电商购物、旅游购票、外卖下单等场景。</p>
+<p>区分于非主业务侧，会存在诸如商业分析、ai训练数据、用户画像等B端应用场景。此时MySQL也会被用作Data Lake数据湖的数据源，通过一些同步方式，例如binlog订阅、kafka-connector + 流式计算组件 flink/spark 传输至Elastic Search、Cassandra、Hbase等这样的OLAP（on-line analysis processing）大数据存储组件，而后B端工作人员基于这些OLAP组件进行后续的操作。</p>
 <h3 id="架构">架构
 </h3><ul>
 <li>
@@ -707,7 +711,7 @@
       </tr>
   </tbody>
 </table></div>
-<h5 id="总结">总结：
+<h5 id="总结">总结
 </h5><ul>
 <li>MySQL会对表中的每个索引建立统计数据，存放在mysql.innodb_index_stats 表中，表字段相对清晰，不赘述。</li>
 <li>普通索引（secondary/covering）含有n个字段时，会保存n+1条不同组合（额外增加id统计）的统计数据。
@@ -724,6 +728,773 @@
 </li>
 <li>根据以上索引的统计数据，优化器可以找到相对最优的索引，而后进行execute查询数据。</li>
 </ul>
+<h4 id="mysql优化经典操作--实现源码">MySQL优化经典操作 &amp; 实现源码
+</h4><p>mysql-server大部分操作源码位于sql目录下：https://github.com/mysql/mysql-server/tree/8.4/sql</p>
+<h5 id="explain">explain
+</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// ignore head include
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Item</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Query_block</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Query_expression</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Query_term</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">String</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">THD</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">AccessPath</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">TABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">mem_root_deque</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">join_type_str</span><span class="p">[];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** Table modification plan for JOIN-less statements (update/delete) */</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Modification_plan</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">THD</span> <span class="o">*</span><span class="k">const</span> <span class="n">thd</span><span class="p">;</span>  <span class="c1">///&lt; Owning thread
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">const</span> <span class="n">enum_mod_type</span>
+</span></span><span class="line"><span class="cl">      <span class="n">mod_type</span><span class="p">;</span>  <span class="c1">///&lt; Modification type - MT_INSERT/MT_UPDATE/etc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">TABLE</span> <span class="o">*</span><span class="n">table</span><span class="p">;</span>  <span class="c1">///&lt; Table to modify
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="k">enum</span> <span class="nc">join_type</span> <span class="n">type</span> <span class="o">=</span> <span class="n">JT_UNKNOWN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">AccessPath</span> <span class="o">*</span><span class="n">range_scan</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Item</span> <span class="o">*</span><span class="n">condition</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">key</span><span class="p">;</span>                   <span class="c1">///&lt; Key to use
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">ha_rows</span> <span class="n">limit</span><span class="p">;</span>              <span class="c1">///&lt; Limit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">bool</span> <span class="n">need_tmp_table</span><span class="p">;</span>        <span class="c1">///&lt; Whether tmp table needs to be used
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">bool</span> <span class="n">need_sort</span><span class="p">;</span>             <span class="c1">///&lt; Whether to use filesort
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">bool</span> <span class="n">used_key_is_modified</span><span class="p">;</span>  <span class="c1">///&lt; Whether the key used to scan is modified
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">message</span><span class="p">;</span>        <span class="c1">///&lt; Arbitrary message
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">bool</span> <span class="n">zero_result</span><span class="p">;</span>           <span class="c1">///&lt; true &lt;=&gt; plan will not be executed
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">ha_rows</span> <span class="n">examined_rows</span><span class="p">;</span>  <span class="c1">///&lt; # of rows expected to be examined in the table
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="n">Modification_plan</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd_arg</span><span class="p">,</span> <span class="n">enum_mod_type</span> <span class="n">mt</span><span class="p">,</span> <span class="n">TABLE</span> <span class="o">*</span><span class="n">table_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">enum</span> <span class="nc">join_type</span> <span class="n">type_arg</span><span class="p">,</span> <span class="n">AccessPath</span> <span class="o">*</span><span class="n">quick_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">Item</span> <span class="o">*</span><span class="n">condition_arg</span><span class="p">,</span> <span class="n">uint</span> <span class="n">key_arg</span><span class="p">,</span> <span class="n">ha_rows</span> <span class="n">limit_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="kt">bool</span> <span class="n">need_tmp_table_arg</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">need_sort_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="kt">bool</span> <span class="n">used_key_is_modified_arg</span><span class="p">,</span> <span class="n">ha_rows</span> <span class="n">rows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">Modification_plan</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd_arg</span><span class="p">,</span> <span class="n">enum_mod_type</span> <span class="n">mt</span><span class="p">,</span> <span class="n">TABLE</span> <span class="o">*</span><span class="n">table_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">message_arg</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">zero_result_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">ha_rows</span> <span class="n">rows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="o">~</span><span class="n">Modification_plan</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">register_in_thd</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">  这个类用于实现对 INSERT、REPLACE 和多表 UPDATE/DELETE 的 EXPLAIN 功能。它会在执行过程中取消对数据的实际修改。
+</span></span></span><span class="line"><span class="cl"><span class="cm">  通过重写 prepare()、start_execution() 和 cleanup() 方法，保证在准备和执行时调用底层的拦截器，但不会进行实际的数据修改。
+</span></span></span><span class="line"><span class="cl"><span class="cm">  原文（部分）：it suppresses table data modification by the underlying interceptor object.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Thus, we can use Query_result_explain object in the context of EXPLAIN INSERT/
+</span></span></span><span class="line"><span class="cl"><span class="cm">  REPLACE/UPDATE/DELETE query like we use Query_result_send in the context of
+</span></span></span><span class="line"><span class="cl"><span class="cm">  EXPLAIN SELECT command
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Query_result_explain</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Query_result_send</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Pointer to underlying Query_result_insert, Query_result_update or
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Query_result_delete object.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Query_result</span> <span class="o">*</span><span class="n">interceptor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Query_result_explain</span><span class="p">(</span><span class="n">Query_expression</span> <span class="o">*</span><span class="n">unit_arg</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                       <span class="n">Query_result</span> <span class="o">*</span><span class="n">interceptor_arg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">:</span> <span class="n">Query_result_send</span><span class="p">(),</span> <span class="n">interceptor</span><span class="p">(</span><span class="n">interceptor_arg</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_arg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">use_protocol_adapter</span><span class="p">()</span> <span class="k">const</span> <span class="k">override</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">prepare</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd</span><span class="p">,</span> <span class="k">const</span> <span class="n">mem_root_deque</span><span class="o">&lt;</span><span class="n">Item</span> <span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">list</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">               <span class="n">Query_expression</span> <span class="o">*</span><span class="n">u</span><span class="p">)</span> <span class="k">override</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Query_result_send</span><span class="o">::</span><span class="n">prepare</span><span class="p">(</span><span class="n">thd</span><span class="p">,</span> <span class="n">list</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">||</span>
+</span></span><span class="line"><span class="cl">           <span class="n">interceptor</span><span class="o">-&gt;</span><span class="n">prepare</span><span class="p">(</span><span class="n">thd</span><span class="p">,</span> <span class="n">list</span><span class="p">,</span> <span class="n">u</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">start_execution</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd</span><span class="p">)</span> <span class="k">override</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Query_result_send</span><span class="o">::</span><span class="n">start_execution</span><span class="p">(</span><span class="n">thd</span><span class="p">)</span> <span class="o">||</span>
+</span></span><span class="line"><span class="cl">           <span class="n">interceptor</span><span class="o">-&gt;</span><span class="n">start_execution</span><span class="p">(</span><span class="n">thd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">cleanup</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Query_result_send</span><span class="o">::</span><span class="n">cleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">interceptor</span><span class="o">-&gt;</span><span class="n">cleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * Wrapper class for writing EXPLAIN output to a user variable.
+</span></span></span><span class="line"><span class="cl"><span class="cm"> *
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * This class overrides Query_result_send::send_data() to write the output of
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * the EXPLAIN query to the user variable specified by m_variable_name.
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Query_result_explain_into_var</span> <span class="k">final</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Query_result_explain</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Query_result_explain_into_var</span><span class="p">(</span><span class="n">Query_expression</span> <span class="o">*</span><span class="n">expr</span><span class="p">,</span> <span class="n">Query_result</span> <span class="o">*</span><span class="n">child</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">std</span><span class="o">::</span><span class="n">string_view</span> <span class="n">variable_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">:</span> <span class="n">Query_result_explain</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">child</span><span class="p">),</span> <span class="n">m_variable_name</span><span class="p">(</span><span class="n">variable_name</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">send_result_set_metadata</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="p">,</span> <span class="k">const</span> <span class="n">mem_root_deque</span><span class="o">&lt;</span><span class="n">Item</span> <span class="o">*&gt;</span> <span class="o">&amp;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">uint</span><span class="p">)</span> <span class="k">override</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">send_data</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd</span><span class="p">,</span> <span class="k">const</span> <span class="n">mem_root_deque</span><span class="o">&lt;</span><span class="n">Item</span> <span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">items</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">send_eof</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">string_view</span> <span class="n">m_variable_name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// explain单表CUD写操作函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">explain_single_table_modification</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">explain_thd</span><span class="p">,</span> <span class="k">const</span> <span class="n">THD</span> <span class="o">*</span><span class="n">query_thd</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                       <span class="k">const</span> <span class="n">Modification_plan</span> <span class="o">*</span><span class="n">plan</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                       <span class="n">Query_block</span> <span class="o">*</span><span class="n">select</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// explain复杂CRUD操作函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">explain_query</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">explain_thd</span><span class="p">,</span> <span class="k">const</span> <span class="n">THD</span> <span class="o">*</span><span class="n">query_thd</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                   <span class="n">Query_expression</span> <span class="o">*</span><span class="n">unit</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 多个query block查询块（子查询，细节可查询query_term.h内容）时，会调用这个函数，相当于explain_query的进阶函数，可能会被explain_query多次调用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">explain_query_specification</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">explain_thd</span><span class="p">,</span> <span class="k">const</span> <span class="n">THD</span> <span class="o">*</span><span class="n">query_thd</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                 <span class="n">Query_term</span> <span class="o">*</span><span class="n">query_term</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                 <span class="n">enum_parsing_context</span> <span class="n">ctx</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Sql_cmd_explain_other_thread</span> <span class="k">final</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Sql_cmd</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">Sql_cmd_explain_other_thread</span><span class="p">(</span><span class="n">my_thread_id</span> <span class="n">thread_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">:</span> <span class="n">m_thread_id</span><span class="p">(</span><span class="n">thread_id</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">enum_sql_command</span> <span class="nf">sql_command_code</span><span class="p">()</span> <span class="k">const</span> <span class="k">override</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">SQLCOM_EXPLAIN_OTHER</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">execute</span><span class="p">(</span><span class="n">THD</span> <span class="o">*</span><span class="n">thd</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">/// connection_id in EXPLAIN FOR CONNECTION \&lt;connection_id\&gt;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">my_thread_id</span> <span class="n">m_thread_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Used to generate the &#34;query&#34; field in JSON explain object.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_query_for_explain</span><span class="p">(</span><span class="k">const</span> <span class="n">THD</span> <span class="o">*</span><span class="n">query_thd</span><span class="p">,</span> <span class="n">Query_expression</span> <span class="o">*</span><span class="n">unit</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                             <span class="n">String</span> <span class="o">*</span><span class="n">str</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#endif </span><span class="cm">/* OPT_EXPLAIN_INCLUDED */</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里实现源码过多，感兴趣自行阅读。</p>
+<h5 id="statistic">statistic
+</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">TABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="kt">float</span> <span class="n">rec_per_key_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">KEY</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">  这里内容较少且命名清晰，直接参考原文
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Guesstimate for &#34;records per key&#34; when index statistics is not available.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param table         the table
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param key           the index
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param used_keyparts the number of key part that should be included in the
+</span></span></span><span class="line"><span class="cl"><span class="cm">                       estimate
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return estimated records per key value
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">rec_per_key_t</span> <span class="nf">guess_rec_per_key</span><span class="p">(</span><span class="k">const</span> <span class="n">TABLE</span> <span class="o">*</span><span class="k">const</span> <span class="n">table</span><span class="p">,</span> <span class="k">const</span> <span class="n">KEY</span> <span class="o">*</span><span class="k">const</span> <span class="n">key</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">uint</span> <span class="n">used_keyparts</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#endif </span><span class="cm">/* OPT_STATISTICS_INCLUDED */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 实现：opt_statistic.cc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">rec_per_key_t</span> <span class="nf">guess_rec_per_key</span><span class="p">(</span><span class="k">const</span> <span class="n">TABLE</span> <span class="o">*</span><span class="k">const</span> <span class="n">table</span><span class="p">,</span> <span class="k">const</span> <span class="n">KEY</span> <span class="o">*</span><span class="k">const</span> <span class="n">key</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">uint</span> <span class="n">used_keyparts</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 参数校验
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">used_keyparts</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">used_keyparts</span> <span class="o">&lt;=</span> <span class="n">key</span><span class="o">-&gt;</span><span class="n">actual_key_parts</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">has_records_per_key</span><span class="p">(</span><span class="n">used_keyparts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 从 table 对象中获取总记录数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">const</span> <span class="n">ha_rows</span> <span class="n">table_rows</span> <span class="o">=</span> <span class="n">table</span><span class="o">-&gt;</span><span class="n">file</span><span class="o">-&gt;</span><span class="n">stats</span><span class="p">.</span><span class="n">records</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">    预估key匹配records：
+</span></span></span><span class="line"><span class="cl"><span class="cm">    如果统计信息中有key匹配的records记录就直接使用
+</span></span></span><span class="line"><span class="cl"><span class="cm">    没有的话唯一索引默认匹配一个，普通索引默认匹配10个
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">rec_per_key_t</span> <span class="n">rec_per_key_all</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">has_records_per_key</span><span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">user_defined_key_parts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rec_per_key_all</span> <span class="o">=</span> <span class="n">key</span><span class="o">-&gt;</span><span class="n">records_per_key</span><span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">user_defined_key_parts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">actual_flags</span> <span class="o">&amp;</span> <span class="n">HA_NOSAME</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">rec_per_key_all</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>  <span class="c1">// Unique index
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">rec_per_key_all</span> <span class="o">=</span> <span class="mf">10.0f</span><span class="p">;</span>  <span class="c1">// Non-unique index
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">      <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">        之前假设普通索引匹配10条，如果是很小的这里需要调整实际匹配量
+</span></span></span><span class="line"><span class="cl"><span class="cm">      */</span>
+</span></span><span class="line"><span class="cl">      <span class="n">rec_per_key_all</span> <span class="o">=</span>
+</span></span><span class="line"><span class="cl">          <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">rec_per_key_all</span><span class="p">,</span> <span class="n">max</span><span class="p">(</span><span class="n">rec_per_key_t</span><span class="p">(</span><span class="n">table_rows</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">rec_per_key_t</span> <span class="n">rec_per_key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 假设第一个键部分匹配1%的记录，总体记录数的1%作为估算
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">const</span> <span class="n">rec_per_key_t</span> <span class="n">rec_per_key_first</span> <span class="o">=</span> <span class="n">table_rows</span> <span class="o">*</span> <span class="mf">0.01f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">rec_per_key_first</span> <span class="o">&lt;</span> <span class="n">rec_per_key_all</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 第一部分的估算小于完整键的估算，直接使用完整键的估算。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">rec_per_key</span> <span class="o">=</span> <span class="n">rec_per_key_all</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">user_defined_key_parts</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// See formula above：随着使用的键部分数量的增加，记录的匹配数量将相应调整
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">rec_per_key</span> <span class="o">=</span>
+</span></span><span class="line"><span class="cl">          <span class="n">rec_per_key_first</span> <span class="o">-</span> <span class="p">(</span><span class="n">rec_per_key_t</span><span class="p">(</span><span class="n">used_keyparts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span>
+</span></span><span class="line"><span class="cl">                               <span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">user_defined_key_parts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">                                  <span class="p">(</span><span class="n">rec_per_key_first</span> <span class="o">-</span> <span class="n">rec_per_key_all</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// 对于单列索引，依据索引的唯一性直接返回相应的估算值。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="o">-&gt;</span><span class="n">actual_flags</span> <span class="o">&amp;</span> <span class="n">HA_NOSAME</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rec_per_key</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>  <span class="c1">// Unique index
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rec_per_key</span> <span class="o">=</span> <span class="n">rec_per_key_first</span><span class="p">;</span>  <span class="c1">// Non-unique index
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="n">rec_per_key</span> <span class="o">&gt;=</span> <span class="n">rec_per_key_all</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">rec_per_key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中存在部分外部函数：均来自于key.h</p>
+<ul>
+<li>has_records_per_key</li>
+<li>records_per_key</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// 内存中的索引数据结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">KEY</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** Tot length of key */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">key_length</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** dupp key and pack flags */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ulong</span> <span class="n">flags</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** dupp key and pack flags for actual key parts */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ulong</span> <span class="n">actual_flags</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** How many key_parts */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">user_defined_key_parts</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** How many key_parts including hidden parts */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">actual_key_parts</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">     Key parts allocated for primary key parts extension but
+</span></span></span><span class="line"><span class="cl"><span class="cm">     not used due to some reasons(no primary key, duplicated key parts)
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">unused_key_parts</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** Should normally be = actual_key_parts */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">usable_key_parts</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">block_size</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">/// @cond Doxygen_is_confused
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">enum</span> <span class="nc">ha_key_alg</span> <span class="n">algorithm</span> <span class="p">{</span> <span class="n">HA_KEY_ALG_SE_SPECIFIC</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">/// @endcond
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    A flag which indicates that index algorithm for this key was explicitly
+</span></span></span><span class="line"><span class="cl"><span class="cm">    specified by user. So, for example, it should be mentioned in SHOW CREATE
+</span></span></span><span class="line"><span class="cl"><span class="cm">    TABLE output.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">is_algorithm_explicit</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Note that parser is used when the table is opened for use, and
+</span></span></span><span class="line"><span class="cl"><span class="cm">    parser_name is used when the table is being created.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** Fulltext [pre]parser */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">plugin_ref</span> <span class="n">parser</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** Fulltext [pre]parser name */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LEX_CSTRING</span> <span class="n">parser_name</span><span class="p">{</span><span class="k">nullptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">KEY_PART_INFO</span> <span class="o">*</span><span class="n">key_part</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** Name of key */</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Array of AVG(number of records with the same field value) for 1st ... Nth
+</span></span></span><span class="line"><span class="cl"><span class="cm">    key part. 0 means &#39;not known&#39;. For internally created temporary tables,
+</span></span></span><span class="line"><span class="cl"><span class="cm">    this member can be nullptr.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ulong</span> <span class="o">*</span><span class="n">rec_per_key</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    @retval true if this is a functional index (at least one of the key parts
+</span></span></span><span class="line"><span class="cl"><span class="cm">                 is a functional key part).
+</span></span></span><span class="line"><span class="cl"><span class="cm">    @retval false if this isn&#39;t a functional index.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_functional_index</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Can&#39;t use in-class initialization as long as we memset-initialize
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// the struct
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">LEX_CSTRING</span> <span class="n">engine_attribute</span><span class="p">{</span><span class="k">nullptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LEX_CSTRING</span> <span class="n">secondary_engine_attribute</span><span class="p">{</span><span class="k">nullptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Estimate for how much of the index data that is currently
+</span></span></span><span class="line"><span class="cl"><span class="cm">    available in a memory buffer. Valid range is [0..1]. This will be
+</span></span></span><span class="line"><span class="cl"><span class="cm">    initialized to a IN_MEMORY_ESTIMATE_UNKNOWN. If it still has this
+</span></span></span><span class="line"><span class="cl"><span class="cm">    value when used, it means that the storage engine has not supplied
+</span></span></span><span class="line"><span class="cl"><span class="cm">    a value.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">double</span> <span class="n">m_in_memory_estimate</span><span class="p">{</span><span class="mf">0.0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    这里就是每一个索引匹配的records数量数据结构，通过指针存了一个float数组
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Array of AVG(number of records with the same field value) for 1st ... Nth
+</span></span></span><span class="line"><span class="cl"><span class="cm">    key part. For internally created temporary tables, this member can be
+</span></span></span><span class="line"><span class="cl"><span class="cm">    nullptr. This is the same information as stored in the above
+</span></span></span><span class="line"><span class="cl"><span class="cm">    rec_per_key array but using float values instead of integer
+</span></span></span><span class="line"><span class="cl"><span class="cm">    values. If the storage engine has supplied values in this array,
+</span></span></span><span class="line"><span class="cl"><span class="cm">    these will be used. Otherwise the value in rec_per_key will be
+</span></span></span><span class="line"><span class="cl"><span class="cm">    used.  @todo In the next release the rec_per_key array above
+</span></span></span><span class="line"><span class="cl"><span class="cm">    should be removed and only this should be used.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">rec_per_key_t</span> <span class="o">*</span><span class="n">rec_per_key_float</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    True if this index is visible to the query optimizer. The optimizer may
+</span></span></span><span class="line"><span class="cl"><span class="cm">    only use visible indexes.
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">is_visible</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">TABLE</span> <span class="o">*</span><span class="n">table</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LEX_CSTRING</span> <span class="n">comment</span><span class="p">{</span><span class="k">nullptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Check if records per key estimate is available for given key part.
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">    @param key_part_no key part number, must be in [0, KEY::actual_key_parts)
+</span></span></span><span class="line"><span class="cl"><span class="cm">    @return true if records per key estimate is available, false otherwise
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">has_records_per_key</span><span class="p">(</span><span class="n">uint</span> <span class="n">key_part_no</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="n">key_part_no</span> <span class="o">&lt;</span> <span class="n">actual_key_parts</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">((</span><span class="n">rec_per_key_float</span> <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">             <span class="n">rec_per_key_float</span><span class="p">[</span><span class="n">key_part_no</span><span class="p">]</span> <span class="o">!=</span> <span class="n">REC_PER_KEY_UNKNOWN</span><span class="p">)</span> <span class="o">||</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="n">rec_per_key</span> <span class="o">&amp;&amp;</span> <span class="n">rec_per_key</span><span class="p">[</span><span class="n">key_part_no</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">    Retrieve an estimate for the average number of records per distinct value,
+</span></span></span><span class="line"><span class="cl"><span class="cm">    when looking only at the first key_part_no+1 columns.
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">    If no record per key estimate is available for this key part,
+</span></span></span><span class="line"><span class="cl"><span class="cm">    REC_PER_KEY_UNKNOWN is returned.
+</span></span></span><span class="line"><span class="cl"><span class="cm">    
+</span></span></span><span class="line"><span class="cl"><span class="cm">    @param key_part_no key part number, must be in [0, KEY::actual_key_parts)
+</span></span></span><span class="line"><span class="cl"><span class="cm">    @return Number of records having the same key value
+</span></span></span><span class="line"><span class="cl"><span class="cm">      @retval REC_PER_KEY_UNKNOWN    no records per key estimate available
+</span></span></span><span class="line"><span class="cl"><span class="cm">      @retval != REC_PER_KEY_UNKNOWN record per key estimate
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">rec_per_key_t</span> <span class="nf">records_per_key</span><span class="p">(</span><span class="n">uint</span> <span class="n">key_part_no</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="n">key_part_no</span> <span class="o">&lt;</span> <span class="n">actual_key_parts</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">      If the storage engine has provided rec per key estimates as float
+</span></span></span><span class="line"><span class="cl"><span class="cm">      then use this. If not, use the integer version.
+</span></span></span><span class="line"><span class="cl"><span class="cm">    */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">rec_per_key_float</span><span class="p">[</span><span class="n">key_part_no</span><span class="p">]</span> <span class="o">!=</span> <span class="n">REC_PER_KEY_UNKNOWN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">rec_per_key_float</span><span class="p">[</span><span class="n">key_part_no</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">rec_per_key</span><span class="p">[</span><span class="n">key_part_no</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">               <span class="o">?</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">rec_per_key_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">rec_per_key</span><span class="p">[</span><span class="n">key_part_no</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">               <span class="o">:</span> <span class="n">REC_PER_KEY_UNKNOWN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里代码量较少，可以比较直观的理解mysql优化器统计索引效率的流程。</p>
 <h3 id="存储引擎索引">存储引擎（索引）
 </h3><h4 id="innodb">innoDB
 </h4><ul>
@@ -992,6 +1763,8 @@
     >https://dev.mysql.com/doc/refman/8.4/en/manual-info.html</a></p>
 <p><a class="link" href="https://www.cnblogs.com/kerrycode/p/11821042.html"  target="_blank" rel="noopener"
     >https://www.cnblogs.com/kerrycode/p/11821042.html</a></p>
+<p><a class="link" href="https://github.com/mysql/mysql-server/tree/8.4/sql"  target="_blank" rel="noopener"
+    >https://github.com/mysql/mysql-server/tree/8.4/sql</a></p>
 
 </section>
 
