@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>RDBMS on wenxin-blog</title>
+        <link>http://localhost:1313/zh-cn/categories/rdbms/</link>
+        <description>Recent content in RDBMS on wenxin-blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>yuwenxin</copyright>
+        <lastBuildDate>Sun, 15 Sep 2024 00:59:34 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/categories/rdbms/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>高性能MySql-事务与xlog</title>
+        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</link>
+        <pubDate>Sun, 15 Sep 2024 00:59:34 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>高性能MySql-索引</title>
+        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</link>
+        <pubDate>Sun, 15 Sep 2024 00:58:54 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>高性能MySql-通信</title>
+        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</link>
+        <pubDate>Sun, 15 Sep 2024 00:58:40 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>高性能MySql-概览</title>
+        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</link>
+        <pubDate>Sun, 15 Sep 2024 00:58:29 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</guid>
+        <description>&lt;h2 id=&#34;mysql概览&#34;&gt;MySQL概览
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;关系型（行存储）&lt;/li&gt;
+&lt;li&gt;持久化（硬盘/外存）&lt;/li&gt;
+&lt;li&gt;事务支持（ACID）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;架构&#34;&gt;架构
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;client/server&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;binlog&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://dev.mysql.com/doc/refman/8.4/en/images/mysql-architecture.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;MySQL-arch&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;流程&#34;&gt;流程
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;client端发起通信请求，通过tcp建立连接connection。&lt;/li&gt;
+&lt;li&gt;server端进行user/password&lt;strong&gt;鉴权&lt;/strong&gt;（auth）。
+&lt;ul&gt;
+&lt;li&gt;数据库mysql的user表中进行验证。&lt;/li&gt;
+&lt;li&gt;验证通过后，通过mysql 的权限表（mysql中的 user、db、columns_privilege、Host 表，分别存储的是全局级别、数据库级别、表级别、列级别）查询当前用户的权限。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;client端通过connection发送执行的sql脚本语句。&lt;/li&gt;
+&lt;li&gt;server端收到sql后对查询操作进行&lt;strong&gt;缓存判定&lt;/strong&gt;（cache）。
+&lt;ul&gt;
+&lt;li&gt;在 MYSQL5.6以后默认关闭缓存，并且在 8.0 后功能置为Deprecated废弃，不推荐使用。原因是：在大多数使用场景下cache命中率过低（必须是两个&lt;strong&gt;完全一致&lt;/strong&gt;的&lt;strong&gt;查询语句&lt;/strong&gt;才能命中缓存）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;server端缓存未命中则进行&lt;strong&gt;sql解析&lt;/strong&gt;（parser）。
+&lt;ul&gt;
+&lt;li&gt;from -&amp;gt; on -&amp;gt; join -&amp;gt; where -&amp;gt; group by -&amp;gt; having+聚合函数 -&amp;gt; select -&amp;gt; order by -&amp;gt; limit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;server端解析成功后&lt;strong&gt;优化器&lt;/strong&gt;会根据索引信息选择相对最佳方案（optimizer）。
+&lt;ul&gt;
+&lt;li&gt;优化器会根据&lt;strong&gt;扫描行数&lt;/strong&gt;、&lt;strong&gt;是否使用临时表&lt;/strong&gt;、&lt;strong&gt;是否排序等&lt;/strong&gt;来判断是否使用某个索引，其中扫描行数的计算可以通过&lt;strong&gt;统计信息来估算得出&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;统计信息可以看作是索引唯一数的数量&lt;/strong&gt;，mysql内部通过部分采样来估算：具体就是选择 N 个数据页，统计这些页上数据的不同值，得到一个平均值，然后乘以这个索引的页面数，就得到了。&lt;/li&gt;
+&lt;li&gt;由于索引数据会变化，所以索引的统计信息也会变化。当&lt;strong&gt;变更的数据行数超过 1/M&lt;/strong&gt; 的时候，就会重新计算一次统计信息。也可以通过 &amp;ldquo;analyze table 表名&amp;rdquo; 来重新计算索引的统计信息。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;统计信息是否持久化&lt;/strong&gt;：通过innodb_stats_persistent，设置为 on 的时候，表示统计信息会持久化存储。&lt;strong&gt;持久化存储开启时，默认的 N 是 20，M 是 10。设置为 off 的时候，表示统计信息只存储在内存中。这时，默认的 N 是 8，M 是 16。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;server端将优化器选择的索引方案交由&lt;strong&gt;存储引擎执行器&lt;/strong&gt;进行数据查询（executor）。&lt;/li&gt;
+&lt;li&gt;server端将查询结果写入缓存 &amp;amp; 返回给client端。&lt;/li&gt;
+&lt;li&gt;client端接收到返回结果，完成sql操作。
+&lt;ul&gt;
+&lt;li&gt;如果client端是通过sdk（编程语言connector）进行连接，后续则可以通过一些orm框架进行table - model映射。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;优化器---实操理解&#34;&gt;优化器 - 实操理解
+&lt;/h4&gt;&lt;h5 id=&#34;建表--查询该表的统计信息&#34;&gt;建表 &amp;amp; 查询该表的统计信息
+&lt;/h5&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;create&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t_user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;           &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;bigint&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;auto_increment&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;comment&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pk id&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;primary&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;username&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;     &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;256&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;           &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;real_name&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;32&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;nick_name&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;32&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;password&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;     &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;256&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;           &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;phone_number&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;locale&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;       &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;country&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;varchar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;not&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;comment&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;user table&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;create&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;index&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx_country_locale_user&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t_user&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;country&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;locale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;username&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;create&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;index&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx_locale_user&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t_user&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;locale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;username&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;create&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;index&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx_real_name&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t_user&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;real_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;select&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;from&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mysql&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;innodb_index_stats&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;where&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;table_name&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;t_user&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;返回结果：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;#&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;database_name&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;table_name&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;index_name&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;last_update&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;stat_name&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;stat_value&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;sample_size&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;stat_description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PRIMARY&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx01&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;id&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PRIMARY&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_leaf_pages&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of leaf pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PRIMARY&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;size&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_country_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx01&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;country&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_country_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx02&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;country,locale&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;6&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_country_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx03&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;country,locale,username&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;7&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_country_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx04&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;country,locale,username,id&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_country_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_leaf_pages&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of leaf pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;9&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_country_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;size&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;10&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx01&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;locale&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;11&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx02&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;locale,username&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;12&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx03&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;locale,username,id&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;13&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_leaf_pages&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of leaf pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;14&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_locale_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;size&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;15&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_real_name&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx01&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;real_name&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;16&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_real_name&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_diff_pfx02&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;real_name,id&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;17&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_real_name&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;n_leaf_pages&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of leaf pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;18&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;db_rag_application&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;t_user&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;idx_real_name&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2024/9/21 15:27&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;size&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Number of pages in the index&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h5 id=&#34;总结&#34;&gt;总结：
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;MySQL会对表中的每个索引建立统计数据，存放在mysql.innodb_index_stats 表中，表字段相对清晰，不赘述。&lt;/li&gt;
+&lt;li&gt;普通索引（secondary/covering）含有n个字段时，会保存n+1条不同组合（额外增加id统计）的统计数据。
+&lt;ul&gt;
+&lt;li&gt;例如user表中key (country, locale, user)，产生4个统计数据记录
+&lt;ul&gt;
+&lt;li&gt;country, locale, user&lt;/li&gt;
+&lt;li&gt;country, locale&lt;/li&gt;
+&lt;li&gt;country&lt;/li&gt;
+&lt;li&gt;country, locale, user, id&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;根据以上索引的统计数据，优化器可以找到相对最优的索引，而后进行execute查询数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;存储引擎索引&#34;&gt;存储引擎（索引）
+&lt;/h3&gt;&lt;h4 id=&#34;innodb&#34;&gt;innoDB
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;事务支持&lt;/li&gt;
+&lt;li&gt;mvcc&lt;/li&gt;
+&lt;li&gt;行锁&lt;/li&gt;
+&lt;li&gt;redolog &amp;amp; undolog&lt;/li&gt;
+&lt;li&gt;.ibd文件存索引+数据
+&lt;ul&gt;
+&lt;li&gt;InnoDB的文件结构可以划分为多个&lt;strong&gt;段（segment）、区（extent）、页（page）等层级&lt;/strong&gt;。每个索引都存储在特定的段中，而每个段又由多个区组成，每个区包含多个页。在InnoDB中，&lt;strong&gt;页是磁盘和内存之间交换数据的最小单位&lt;/strong&gt;，通常是16KB大小。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Feature&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Support&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;B-tree indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Clustered indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Compressed data&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Data caches&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Foreign key support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Full-text search indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Geospatial data type support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Geospatial indexing support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Hash indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Index caches&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Locking granularity&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Row&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;MVCC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Storage limits&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;64TB&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T-tree indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Transactions&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Update statistics for data dictionary&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h5 id=&#34;架构-1&#34;&gt;架构
+&lt;/h5&gt;&lt;p&gt;&lt;img src=&#34;https://dev.mysql.com/doc/refman/8.4/en/images/innodb-architecture-8-0.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;innodb-arch&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;myisam&#34;&gt;MyISAM
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;表锁&lt;/li&gt;
+&lt;li&gt;读多写少&lt;/li&gt;
+&lt;li&gt;.MYI文件存储索引信息，.MYD文件存储数据（查索引后需要回表）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Feature&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Support&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;B-tree indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Clustered indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Compressed data&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes (Compressed MyISAM tables are supported only when using the compressed row format. Tables using the compressed row format with MyISAM are read only.)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Data caches&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Foreign key support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Full-text search indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Geospatial data type support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Geospatial indexing support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Hash indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Index caches&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Locking granularity&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Table&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;MVCC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Storage limits&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;256TB&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T-tree indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Transactions&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Update statistics for data dictionary&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;memory&#34;&gt;MEMORY
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;内存&lt;/li&gt;
+&lt;li&gt;hash&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Feature&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Support&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;B-tree indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Clustered indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Compressed data&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Data caches&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Foreign key support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Full-text search indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Geospatial data type support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Geospatial indexing support&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Hash indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Index caches&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Locking granularity&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Table&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;MVCC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Storage limits&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RAM&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T-tree indexes&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Transactions&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;No&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Update statistics for data dictionary&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Yes&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;其他存储引擎略&#34;&gt;其他存储引擎（略）
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;CSV&lt;/li&gt;
+&lt;li&gt;ARCHIVE&lt;/li&gt;
+&lt;li&gt;MERGE&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;参考：&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.4/en/manual-info.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://dev.mysql.com/doc/refman/8.4/en/manual-info.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/kerrycode/p/11821042.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.cnblogs.com/kerrycode/p/11821042.html&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

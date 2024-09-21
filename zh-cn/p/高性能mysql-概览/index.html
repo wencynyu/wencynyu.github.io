@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="高性能MySql 概览">
+<title>高性能MySql-概览</title>
+
+<link rel='canonical' href='http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="高性能MySql-概览">
+<meta property='og:description' content="高性能MySql 概览">
+<meta property='og:url' content='http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/'>
+<meta property='og:site_name' content='wenxin-blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-09-15T00:58:29&#43;08:00'/><meta property='article:modified_time' content='2024-09-15T00:58:29&#43;08:00'/>
+<meta name="twitter:title" content="高性能MySql-概览">
+<meta name="twitter:description" content="高性能MySql 概览">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu897059592634026878.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/zh-cn">wenxin-blog</a></h1>
+            <h2 class="site-description">There are some programing and life blog by wenxin.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/wencynyu'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/zh-cn/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/zh-cn/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/zh-cn/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/zh-cn/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#mysql概览">MySQL概览</a>
+      <ol>
+        <li><a href="#架构">架构</a></li>
+        <li><a href="#流程">流程</a>
+          <ol>
+            <li><a href="#优化器---实操理解">优化器 - 实操理解</a></li>
+          </ol>
+        </li>
+        <li><a href="#存储引擎索引">存储引擎（索引）</a>
+          <ol>
+            <li><a href="#innodb">innoDB</a></li>
+            <li><a href="#myisam">MyISAM</a></li>
+            <li><a href="#memory">MEMORY</a></li>
+            <li><a href="#其他存储引擎略">其他存储引擎（略）</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/%E5%90%8E%E7%AB%AF/" >
+                后端
+            </a>
+        
+            <a href="/zh-cn/categories/rdbms/" >
+                RDBMS
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/">高性能MySql-概览</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            高性能MySql 概览
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 15, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="mysql概览">MySQL概览
+</h2><ul>
+<li>关系型（行存储）</li>
+<li>持久化（硬盘/外存）</li>
+<li>事务支持（ACID）</li>
+</ul>
+<h3 id="架构">架构
+</h3><ul>
+<li>
+<p><strong>client/server</strong></p>
+</li>
+<li>
+<p>binlog</p>
+</li>
+</ul>
+<p><img src="https://dev.mysql.com/doc/refman/8.4/en/images/mysql-architecture.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="MySQL-arch"
+	
+	
+></p>
+<h3 id="流程">流程
+</h3><ol>
+<li>client端发起通信请求，通过tcp建立连接connection。</li>
+<li>server端进行user/password<strong>鉴权</strong>（auth）。
+<ul>
+<li>数据库mysql的user表中进行验证。</li>
+<li>验证通过后，通过mysql 的权限表（mysql中的 user、db、columns_privilege、Host 表，分别存储的是全局级别、数据库级别、表级别、列级别）查询当前用户的权限。</li>
+</ul>
+</li>
+<li>client端通过connection发送执行的sql脚本语句。</li>
+<li>server端收到sql后对查询操作进行<strong>缓存判定</strong>（cache）。
+<ul>
+<li>在 MYSQL5.6以后默认关闭缓存，并且在 8.0 后功能置为Deprecated废弃，不推荐使用。原因是：在大多数使用场景下cache命中率过低（必须是两个<strong>完全一致</strong>的<strong>查询语句</strong>才能命中缓存）。</li>
+</ul>
+</li>
+<li>server端缓存未命中则进行<strong>sql解析</strong>（parser）。
+<ul>
+<li>from -&gt; on -&gt; join -&gt; where -&gt; group by -&gt; having+聚合函数 -&gt; select -&gt; order by -&gt; limit</li>
+</ul>
+</li>
+<li>server端解析成功后<strong>优化器</strong>会根据索引信息选择相对最佳方案（optimizer）。
+<ul>
+<li>优化器会根据<strong>扫描行数</strong>、<strong>是否使用临时表</strong>、<strong>是否排序等</strong>来判断是否使用某个索引，其中扫描行数的计算可以通过<strong>统计信息来估算得出</strong>。</li>
+<li><strong>统计信息可以看作是索引唯一数的数量</strong>，mysql内部通过部分采样来估算：具体就是选择 N 个数据页，统计这些页上数据的不同值，得到一个平均值，然后乘以这个索引的页面数，就得到了。</li>
+<li>由于索引数据会变化，所以索引的统计信息也会变化。当<strong>变更的数据行数超过 1/M</strong> 的时候，就会重新计算一次统计信息。也可以通过 &ldquo;analyze table 表名&rdquo; 来重新计算索引的统计信息。</li>
+<li><strong>统计信息是否持久化</strong>：通过innodb_stats_persistent，设置为 on 的时候，表示统计信息会持久化存储。<strong>持久化存储开启时，默认的 N 是 20，M 是 10。设置为 off 的时候，表示统计信息只存储在内存中。这时，默认的 N 是 8，M 是 16。</strong></li>
+</ul>
+</li>
+<li>server端将优化器选择的索引方案交由<strong>存储引擎执行器</strong>进行数据查询（executor）。</li>
+<li>server端将查询结果写入缓存 &amp; 返回给client端。</li>
+<li>client端接收到返回结果，完成sql操作。
+<ul>
+<li>如果client端是通过sdk（编程语言connector）进行连接，后续则可以通过一些orm框架进行table - model映射。</li>
+</ul>
+</li>
+</ol>
+<h4 id="优化器---实操理解">优化器 - 实操理解
+</h4><h5 id="建表--查询该表的统计信息">建表 &amp; 查询该表的统计信息
+</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">t_user</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">id</span><span class="w">           </span><span class="nb">bigint</span><span class="w"> </span><span class="n">auto_increment</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;pk id&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">username</span><span class="w">     </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span><span class="w">           </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">real_name</span><span class="w">    </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">nick_name</span><span class="w">    </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">password</span><span class="w">     </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span><span class="w">           </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">phone_number</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">locale</span><span class="w">       </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="w">  </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">country</span><span class="w">      </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">  </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;user table&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_country_locale_user</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">on</span><span class="w"> </span><span class="n">t_user</span><span class="w"> </span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="w"> </span><span class="n">locale</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_locale_user</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">on</span><span class="w"> </span><span class="n">t_user</span><span class="w"> </span><span class="p">(</span><span class="n">locale</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_real_name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">on</span><span class="w"> </span><span class="n">t_user</span><span class="w"> </span><span class="p">(</span><span class="n">real_name</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">mysql</span><span class="p">.</span><span class="n">innodb_index_stats</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="k">table_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;t_user&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>返回结果：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">#</th>
+          <th style="text-align: left">database_name</th>
+          <th style="text-align: left">table_name</th>
+          <th style="text-align: left">index_name</th>
+          <th style="text-align: left">last_update</th>
+          <th style="text-align: left">stat_name</th>
+          <th style="text-align: left">stat_value</th>
+          <th style="text-align: left">sample_size</th>
+          <th style="text-align: left">stat_description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">PRIMARY</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx01</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">id</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">2</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">PRIMARY</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_leaf_pages</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of leaf pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">3</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">PRIMARY</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">size</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">4</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_country_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx01</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">country</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">5</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_country_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx02</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">country,locale</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">6</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_country_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx03</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">country,locale,username</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">7</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_country_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx04</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">country,locale,username,id</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">8</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_country_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_leaf_pages</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of leaf pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">9</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_country_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">size</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">10</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx01</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">locale</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">11</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx02</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">locale,username</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">12</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx03</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">locale,username,id</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">13</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_leaf_pages</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of leaf pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">14</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_locale_user</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">size</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">15</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_real_name</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx01</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">real_name</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">16</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_real_name</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_diff_pfx02</td>
+          <td style="text-align: left">0</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">real_name,id</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">17</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_real_name</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">n_leaf_pages</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of leaf pages in the index</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">18</td>
+          <td style="text-align: left">db_rag_application</td>
+          <td style="text-align: left">t_user</td>
+          <td style="text-align: left">idx_real_name</td>
+          <td style="text-align: left">2024/9/21 15:27</td>
+          <td style="text-align: left">size</td>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">Number of pages in the index</td>
+      </tr>
+  </tbody>
+</table></div>
+<h5 id="总结">总结：
+</h5><ul>
+<li>MySQL会对表中的每个索引建立统计数据，存放在mysql.innodb_index_stats 表中，表字段相对清晰，不赘述。</li>
+<li>普通索引（secondary/covering）含有n个字段时，会保存n+1条不同组合（额外增加id统计）的统计数据。
+<ul>
+<li>例如user表中key (country, locale, user)，产生4个统计数据记录
+<ul>
+<li>country, locale, user</li>
+<li>country, locale</li>
+<li>country</li>
+<li>country, locale, user, id</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>根据以上索引的统计数据，优化器可以找到相对最优的索引，而后进行execute查询数据。</li>
+</ul>
+<h3 id="存储引擎索引">存储引擎（索引）
+</h3><h4 id="innodb">innoDB
+</h4><ul>
+<li>事务支持</li>
+<li>mvcc</li>
+<li>行锁</li>
+<li>redolog &amp; undolog</li>
+<li>.ibd文件存索引+数据
+<ul>
+<li>InnoDB的文件结构可以划分为多个<strong>段（segment）、区（extent）、页（page）等层级</strong>。每个索引都存储在特定的段中，而每个段又由多个区组成，每个区包含多个页。在InnoDB中，<strong>页是磁盘和内存之间交换数据的最小单位</strong>，通常是16KB大小。</li>
+</ul>
+</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature</th>
+          <th style="text-align: left">Support</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">B-tree indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Clustered indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Compressed data</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Data caches</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Foreign key support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Full-text search indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial data type support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial indexing support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Hash indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Index caches</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Locking granularity</td>
+          <td style="text-align: left">Row</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">MVCC</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Storage limits</td>
+          <td style="text-align: left">64TB</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">T-tree indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Transactions</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Update statistics for data dictionary</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+  </tbody>
+</table></div>
+<h5 id="架构-1">架构
+</h5><p><img src="https://dev.mysql.com/doc/refman/8.4/en/images/innodb-architecture-8-0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="innodb-arch"
+	
+	
+></p>
+<h4 id="myisam">MyISAM
+</h4><ul>
+<li>表锁</li>
+<li>读多写少</li>
+<li>.MYI文件存储索引信息，.MYD文件存储数据（查索引后需要回表）</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature</th>
+          <th style="text-align: left">Support</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">B-tree indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Clustered indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Compressed data</td>
+          <td style="text-align: left">Yes (Compressed MyISAM tables are supported only when using the compressed row format. Tables using the compressed row format with MyISAM are read only.)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Data caches</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Foreign key support</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Full-text search indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial data type support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial indexing support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Hash indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Index caches</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Locking granularity</td>
+          <td style="text-align: left">Table</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">MVCC</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Storage limits</td>
+          <td style="text-align: left">256TB</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">T-tree indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Transactions</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Update statistics for data dictionary</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+  </tbody>
+</table></div>
+<h4 id="memory">MEMORY
+</h4><ul>
+<li>内存</li>
+<li>hash</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature</th>
+          <th style="text-align: left">Support</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">B-tree indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Clustered indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Compressed data</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Data caches</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Foreign key support</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Full-text search indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial data type support</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial indexing support</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Hash indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Index caches</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Locking granularity</td>
+          <td style="text-align: left">Table</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">MVCC</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Storage limits</td>
+          <td style="text-align: left">RAM</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">T-tree indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Transactions</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Update statistics for data dictionary</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+  </tbody>
+</table></div>
+<h4 id="其他存储引擎略">其他存储引擎（略）
+</h4><ul>
+<li>CSV</li>
+<li>ARCHIVE</li>
+<li>MERGE</li>
+</ul>
+<p>参考：</p>
+<p><a class="link" href="https://dev.mysql.com/doc/refman/8.4/en/manual-info.html"  target="_blank" rel="noopener"
+    >https://dev.mysql.com/doc/refman/8.4/en/manual-info.html</a></p>
+<p><a class="link" href="https://www.cnblogs.com/kerrycode/p/11821042.html"  target="_blank" rel="noopener"
+    >https://www.cnblogs.com/kerrycode/p/11821042.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">高性能MySql-事务与xlog</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">高性能MySql-索引</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">高性能MySql-通信</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/zh-cn/p/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1-%E9%89%B4%E6%9D%83%E6%8E%88%E6%9D%83/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">权限设计-鉴权授权</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-orm-spring/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">开发框架-orm-spring</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            1998 - 
+        
+        2024 yuwenxin
+    </section>
+    
+    <section class="powerby">
+        
+            welcome to wenxin-blog <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.27.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
