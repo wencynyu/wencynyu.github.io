@@ -65,6 +65,31 @@
 	
 	
 &gt;&lt;/p&gt;
+&lt;h4 id=&#34;源码结构核心&#34;&gt;源码结构（核心）
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;client：客户端实现&lt;/li&gt;
+&lt;li&gt;sql：服务端实现
+&lt;ul&gt;
+&lt;li&gt;auth&lt;/li&gt;
+&lt;li&gt;binlog&lt;/li&gt;
+&lt;li&gt;optimizer&lt;/li&gt;
+&lt;li&gt;parser&lt;/li&gt;
+&lt;li&gt;key&lt;/li&gt;
+&lt;li&gt;lock&lt;/li&gt;
+&lt;li&gt;mysqld&lt;/li&gt;
+&lt;li&gt;sql-command&lt;/li&gt;
+&lt;li&gt;sql-connect&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;storage：存储引擎实现
+&lt;ul&gt;
+&lt;li&gt;innobase&lt;/li&gt;
+&lt;li&gt;myisam&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;vio：virtual io，系统io的抽象层&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;省略include、share、route、test、script等非核心内容。&lt;/p&gt;
 &lt;h3 id=&#34;流程&#34;&gt;流程
 &lt;/h3&gt;&lt;ol&gt;
 &lt;li&gt;client端发起通信请求，通过tcp建立连接connection。&lt;/li&gt;

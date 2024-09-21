@@ -273,7 +273,11 @@
   <ol>
     <li><a href="#mysql概览">MySQL概览</a>
       <ol>
-        <li><a href="#架构">架构</a></li>
+        <li><a href="#架构">架构</a>
+          <ol>
+            <li><a href="#源码结构核心">源码结构（核心）</a></li>
+          </ol>
+        </li>
         <li><a href="#流程">流程</a>
           <ol>
             <li><a href="#优化器---实操理解">优化器 - 实操理解</a></li>
@@ -405,6 +409,31 @@
 	
 	
 ></p>
+<h4 id="源码结构核心">源码结构（核心）
+</h4><ul>
+<li>client：客户端实现</li>
+<li>sql：服务端实现
+<ul>
+<li>auth</li>
+<li>binlog</li>
+<li>optimizer</li>
+<li>parser</li>
+<li>key</li>
+<li>lock</li>
+<li>mysqld</li>
+<li>sql-command</li>
+<li>sql-connect</li>
+</ul>
+</li>
+<li>storage：存储引擎实现
+<ul>
+<li>innobase</li>
+<li>myisam</li>
+</ul>
+</li>
+<li>vio：virtual io，系统io的抽象层</li>
+</ul>
+<p>省略include、share、route、test、script等非核心内容。</p>
 <h3 id="流程">流程
 </h3><ol>
 <li>client端发起通信请求，通过tcp建立连接connection。</li>
