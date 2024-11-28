@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Categories on wenxin-blog</title>
-        <link>https://wencynyu.github.io/en/categories/</link>
+        <link>http://localhost:1313/en/categories/</link>
         <description>Recent content in Categories on wenxin-blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>yuwenxin</copyright>
-        <lastBuildDate>Thu, 07 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://wencynyu.github.io/en/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 07 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/en/categories/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Front-End</title>
-        <link>https://wencynyu.github.io/en/categories/front-end/</link>
+        <link>http://localhost:1313/en/categories/front-end/</link>
         <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://wencynyu.github.io/en/categories/front-end/</guid>
+        <guid>http://localhost:1313/en/categories/front-end/</guid>
         <description></description>
         </item>
         

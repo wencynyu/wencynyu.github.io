@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Hugo-Slack-Theme文档 on wenxin-blog</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/</link>
+        <link>http://localhost:1313/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/</link>
         <description>Recent content in Hugo-Slack-Theme文档 on wenxin-blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>yuwenxin</copyright>
-        <lastBuildDate>Thu, 07 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 07 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Markdown基本语法</title>
-        <link>https://wencynyu.github.io/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</link>
+        <link>http://localhost:1313/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</link>
         <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://wencynyu.github.io/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</guid>
+        <guid>http://localhost:1313/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</guid>
         <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;
 &lt;h2 id=&#34;headings&#34;&gt;Headings
 &lt;/h2&gt;&lt;p&gt;The following HTML &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;—&lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; elements represent six levels of section headings. &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt; is the highest section level while &lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; is the lowest.&lt;/p&gt;

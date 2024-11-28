@@ -2,49 +2,49 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Tags on wenxin-blog</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/</link>
+        <link>http://localhost:1313/zh-cn/tags/</link>
         <description>Recent content in Tags on wenxin-blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>yuwenxin</copyright>
-        <lastBuildDate>Sat, 14 Sep 2024 02:06:14 +0800</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 14 Sep 2024 02:06:14 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>神经网络</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <link>http://localhost:1313/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
         <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
         
-        <guid>https://wencynyu.github.io/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <guid>http://localhost:1313/zh-cn/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
         <description></description>
         </item>
         <item>
         <title>数理基础</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</link>
+        <link>http://localhost:1313/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</link>
         <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
         
-        <guid>https://wencynyu.github.io/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</guid>
+        <guid>http://localhost:1313/zh-cn/tags/%E6%95%B0%E7%90%86%E5%9F%BA%E7%A1%80/</guid>
         <description></description>
         </item>
         <item>
         <title>Hugo-Slack-Theme文档</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/</link>
+        <link>http://localhost:1313/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/</link>
         <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://wencynyu.github.io/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/</guid>
+        <guid>http://localhost:1313/zh-cn/tags/hugo-slack-theme%E6%96%87%E6%A1%A3/</guid>
         <description></description>
         </item>
         <item>
         <title>概览</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/%E6%A6%82%E8%A7%88/</link>
+        <link>http://localhost:1313/zh-cn/tags/%E6%A6%82%E8%A7%88/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
         
-        <guid>https://wencynyu.github.io/zh-cn/tags/%E6%A6%82%E8%A7%88/</guid>
+        <guid>http://localhost:1313/zh-cn/tags/%E6%A6%82%E8%A7%88/</guid>
         <description></description>
         </item>
         <item>
         <title>计算机网络</title>
-        <link>https://wencynyu.github.io/zh-cn/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link>
+        <link>http://localhost:1313/zh-cn/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
         
-        <guid>https://wencynyu.github.io/zh-cn/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid>
+        <guid>http://localhost:1313/zh-cn/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid>
         <description></description>
         </item>
         
