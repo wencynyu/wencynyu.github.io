@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>wenxin-blog</title>
-        <link>http://localhost:1313/zh-cn/</link>
+        <link>https://wencynyu.github.io/zh-cn/</link>
         <description>Recent content on wenxin-blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>yuwenxin</copyright>
-        <lastBuildDate>Wed, 20 Nov 2024 03:44:33 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Wed, 20 Nov 2024 03:44:33 +0800</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>高性能 reids-通信</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E9%80%9A%E4%BF%A1/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E9%80%9A%E4%BF%A1/</link>
         <pubDate>Wed, 20 Nov 2024 03:44:33 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E9%80%9A%E4%BF%A1/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E9%80%9A%E4%BF%A1/</guid>
         <description>&lt;h1 id=&#34;redis通信&#34;&gt;redis通信
 &lt;/h1&gt;&lt;h2 id=&#34;源码分析&#34;&gt;源码分析
 &lt;/h2&gt;&lt;h3 id=&#34;系统初始化--eventloop事件循环总线构建&#34;&gt;系统初始化 &amp;amp; eventloop事件循环总线构建
@@ -2586,34 +2586,34 @@
         </item>
         <item>
         <title>高性能MySql-事务与xlog</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</link>
         <pubDate>Sun, 15 Sep 2024 00:59:34 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</guid>
         <description></description>
         </item>
         <item>
         <title>高性能MySql-索引</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</link>
         <pubDate>Sun, 15 Sep 2024 00:58:54 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</guid>
         <description></description>
         </item>
         <item>
         <title>高性能MySql-通信</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</link>
         <pubDate>Sun, 15 Sep 2024 00:58:40 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</guid>
         <description></description>
         </item>
         <item>
         <title>高性能MySql-概览</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</link>
         <pubDate>Sun, 15 Sep 2024 00:58:29 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</guid>
         <description>&lt;h2 id=&#34;mysql概览&#34;&gt;MySQL概览
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;关系型（行存储）&lt;/li&gt;
@@ -4031,42 +4031,42 @@
         </item>
         <item>
         <title>高性能网络通信框架 Netty</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6-netty/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6-netty/</link>
         <pubDate>Sun, 15 Sep 2024 00:56:01 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6-netty/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6-netty/</guid>
         <description></description>
         </item>
         <item>
         <title>高性能&amp;高可用 reids-分布式集群</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E9%AB%98%E5%8F%AF%E7%94%A8-reids-%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E9%AB%98%E5%8F%AF%E7%94%A8-reids-%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4/</link>
         <pubDate>Sun, 15 Sep 2024 00:47:54 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E9%AB%98%E5%8F%AF%E7%94%A8-reids-%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E9%AB%98%E5%8F%AF%E7%94%A8-reids-%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4/</guid>
         <description></description>
         </item>
         <item>
         <title>高性能 reids-空间效率</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E7%A9%BA%E9%97%B4%E6%95%88%E7%8E%87/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E7%A9%BA%E9%97%B4%E6%95%88%E7%8E%87/</link>
         <pubDate>Sun, 15 Sep 2024 00:45:33 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E7%A9%BA%E9%97%B4%E6%95%88%E7%8E%87/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E7%A9%BA%E9%97%B4%E6%95%88%E7%8E%87/</guid>
         <description></description>
         </item>
         <item>
         <title>高性能 reids-时间效率</title>
-        <link>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E6%97%B6%E9%97%B4%E6%95%88%E7%8E%87/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E6%97%B6%E9%97%B4%E6%95%88%E7%8E%87/</link>
         <pubDate>Sun, 15 Sep 2024 00:45:27 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E6%97%B6%E9%97%B4%E6%95%88%E7%8E%87/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD-reids-%E6%97%B6%E9%97%B4%E6%95%88%E7%8E%87/</guid>
         <description></description>
         </item>
         <item>
         <title>神经网络</title>
-        <link>http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
         <pubDate>Sat, 14 Sep 2024 02:06:14 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
         <description>&lt;h2 id=&#34;数学基础&#34;&gt;数学基础：
 &lt;/h2&gt;&lt;p&gt;高等数学：导数、微分、偏导数（多元函数导数）&lt;/p&gt;
 &lt;p&gt;线性代数：向量、行列式、矩阵的基本运算、秩&lt;/p&gt;
@@ -4296,11 +4296,11 @@ $$&lt;p&gt;矩阵 $A$ 的秩是 $2$，因为矩阵的行或列中最大数量的
         </item>
         <item>
         <title>计算机网络基本发展</title>
-        <link>http://localhost:1313/zh-cn/p/hello-world/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/hello-world/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/hello-world/</guid>
-        <description>&lt;img src="http://localhost:1313/zh-cn/p/hello-world/cover.jpg" alt="Featured image of post 计算机网络基本发展" /&gt;&lt;h1 id=&#34;计算机网络&#34;&gt;计算机网络
+        <guid>https://wencynyu.github.io/zh-cn/p/hello-world/</guid>
+        <description>&lt;img src="https://wencynyu.github.io/zh-cn/p/hello-world/cover.jpg" alt="Featured image of post 计算机网络基本发展" /&gt;&lt;h1 id=&#34;计算机网络&#34;&gt;计算机网络
 &lt;/h1&gt;&lt;p&gt;本文主要参考了谢希仁老师编著的《计算机网络》教材第七版，并且后续会更新本书的全部章节，帮助每个程序员新人来理解相关的概念。&lt;/p&gt;
 &lt;p&gt;文章中包含了许多体系化的知识以及相关的发展历史，个人认为据因寻果是一种非常有助于理解学习的内容，激发学习的兴趣的一种学习方法。希望能给各位同学们带来些许帮助。&lt;/p&gt;
 &lt;h2 id=&#34;网络概述&#34;&gt;网络概述
@@ -4530,50 +4530,50 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
         </item>
         <item>
         <title>权限设计-鉴权授权</title>
-        <link>http://localhost:1313/zh-cn/p/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1-%E9%89%B4%E6%9D%83%E6%8E%88%E6%9D%83/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1-%E9%89%B4%E6%9D%83%E6%8E%88%E6%9D%83/</link>
         <pubDate>Sun, 15 Sep 2024 01:23:56 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1-%E9%89%B4%E6%9D%83%E6%8E%88%E6%9D%83/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1-%E9%89%B4%E6%9D%83%E6%8E%88%E6%9D%83/</guid>
         <description></description>
         </item>
         <item>
         <title>开发框架-orm-spring</title>
-        <link>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-orm-spring/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-orm-spring/</link>
         <pubDate>Sun, 15 Sep 2024 01:12:40 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-orm-spring/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-orm-spring/</guid>
         <description></description>
         </item>
         <item>
         <title>开发框架-aop-spring</title>
-        <link>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-aop-spring/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-aop-spring/</link>
         <pubDate>Sun, 15 Sep 2024 01:11:15 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-aop-spring/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-aop-spring/</guid>
         <description></description>
         </item>
         <item>
         <title>开发框架-ioc-spring</title>
-        <link>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-ioc-spring/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-ioc-spring/</link>
         <pubDate>Sun, 15 Sep 2024 01:11:09 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-ioc-spring/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-ioc-spring/</guid>
         <description></description>
         </item>
         <item>
         <title>开发框架-概览-spring</title>
-        <link>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</link>
         <pubDate>Sun, 15 Sep 2024 01:10:50 +0800</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</guid>
         <description></description>
         </item>
         <item>
         <title>Markdown基本语法</title>
-        <link>http://localhost:1313/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</link>
         <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/</guid>
         <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;
 &lt;h2 id=&#34;headings&#34;&gt;Headings
 &lt;/h2&gt;&lt;p&gt;The following HTML &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;—&lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; elements represent six levels of section headings. &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt; is the highest section level while &lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; is the lowest.&lt;/p&gt;
@@ -4770,11 +4770,11 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
         </item>
         <item>
         <title>图片加载 &amp; 展示</title>
-        <link>http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/</link>
         <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/</guid>
-        <description>&lt;img src="http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2.jpg" alt="Featured image of post 图片加载 &amp; 展示" /&gt;&lt;p&gt;Hugo theme Stack supports the creation of interactive image galleries using Markdown. It&amp;rsquo;s powered by &lt;a class=&#34;link&#34; href=&#34;https://photoswipe.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/</guid>
+        <description>&lt;img src="https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2.jpg" alt="Featured image of post 图片加载 &amp; 展示" /&gt;&lt;p&gt;Hugo theme Stack supports the creation of interactive image galleries using Markdown. It&amp;rsquo;s powered by &lt;a class=&#34;link&#34; href=&#34;https://photoswipe.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;PhotoSwipe&lt;/a&gt; and its syntax was inspired by &lt;a class=&#34;link&#34; href=&#34;https://typlog.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Typlog&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;To use this feature, the image must be in the same directory as the Markdown file, as it uses Hugo&amp;rsquo;s page bundle feature to read the dimensions of the image. &lt;strong&gt;External images are not supported.&lt;/strong&gt;&lt;/p&gt;
@@ -4788,10 +4788,10 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;result&#34;&gt;Result
-&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/1.jpg&#34;
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/1.jpg&#34;
 	width=&#34;2000&#34;
 	height=&#34;1400&#34;
-	srcset=&#34;http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/1_hu4574578169203714971.jpg 480w, http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/1_hu9042511268598201431.jpg 1024w&#34;
+	srcset=&#34;https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/1_hu4574578169203714971.jpg 480w, https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/1_hu9042511268598201431.jpg 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;Image 1&#34;
@@ -4801,10 +4801,10 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
 		data-flex-grow=&#34;142&#34;
 		data-flex-basis=&#34;342px&#34;
 	
-&gt; &lt;img src=&#34;http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2.jpg&#34;
+&gt; &lt;img src=&#34;https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2.jpg&#34;
 	width=&#34;1500&#34;
 	height=&#34;2250&#34;
-	srcset=&#34;http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2_hu10699635480308914167.jpg 480w, http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2_hu1741040415904021193.jpg 1024w&#34;
+	srcset=&#34;https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2_hu10699635480308914167.jpg 480w, https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/2_hu1741040415904021193.jpg 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;Image 2&#34;
@@ -4825,11 +4825,11 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
         </item>
         <item>
         <title>外链使用</title>
-        <link>http://localhost:1313/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/</link>
         <pubDate>Fri, 25 Aug 2023 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/</guid>
-        <description>&lt;img src="http://localhost:1313/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/cover.jpg" alt="Featured image of post 外链使用" /&gt;&lt;p&gt;For more details, check out the &lt;a class=&#34;link&#34; href=&#34;https://stack.jimmycai.com/writing/shortcodes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/</guid>
+        <description>&lt;img src="https://wencynyu.github.io/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/cover.jpg" alt="Featured image of post 外链使用" /&gt;&lt;p&gt;For more details, check out the &lt;a class=&#34;link&#34; href=&#34;https://stack.jimmycai.com/writing/shortcodes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;documentation&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;bilibili-video&#34;&gt;Bilibili video
 &lt;/h2&gt;
@@ -4908,10 +4908,10 @@ server是在互联网范围内给用户提供实际服务的企业或个人。
         </item>
         <item>
         <title>数学支持-latex</title>
-        <link>http://localhost:1313/zh-cn/p/%E6%95%B0%E5%AD%A6%E6%94%AF%E6%8C%81-latex/</link>
+        <link>https://wencynyu.github.io/zh-cn/p/%E6%95%B0%E5%AD%A6%E6%94%AF%E6%8C%81-latex/</link>
         <pubDate>Thu, 24 Aug 2023 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/p/%E6%95%B0%E5%AD%A6%E6%94%AF%E6%8C%81-latex/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/p/%E6%95%B0%E5%AD%A6%E6%94%AF%E6%8C%81-latex/</guid>
         <description>&lt;p&gt;Stack has built-in support for math typesetting using &lt;a class=&#34;link&#34; href=&#34;https://katex.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;KaTeX&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;It&amp;rsquo;s not enabled by default side-wide,&lt;/strong&gt; but you can enable it for individual posts by adding &lt;code&gt;math: true&lt;/code&gt; to the front matter. Or you can enable it side-wide by adding &lt;code&gt;math = true&lt;/code&gt; to the &lt;code&gt;params.article&lt;/code&gt; section in &lt;code&gt;config.toml&lt;/code&gt;.&lt;/p&gt;
@@ -4958,18 +4958,18 @@ $$&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
         </item>
         <item>
         <title>归档</title>
-        <link>http://localhost:1313/zh-cn/archives/</link>
+        <link>https://wencynyu.github.io/zh-cn/archives/</link>
         <pubDate>Wed, 16 Sep 1998 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/archives/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/archives/</guid>
         <description></description>
         </item>
         <item>
         <title>Links</title>
-        <link>http://localhost:1313/zh-cn/links/</link>
+        <link>https://wencynyu.github.io/zh-cn/links/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/links/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/links/</guid>
         <description>&lt;p&gt;To use this feature, add &lt;code&gt;links&lt;/code&gt; section to frontmatter.&lt;/p&gt;
 &lt;p&gt;This page&amp;rsquo;s frontmatter:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -5001,10 +5001,10 @@ $$&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
         </item>
         <item>
         <title>Search</title>
-        <link>http://localhost:1313/zh-cn/search/</link>
+        <link>https://wencynyu.github.io/zh-cn/search/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/zh-cn/search/</guid>
+        <guid>https://wencynyu.github.io/zh-cn/search/</guid>
         <description></description>
         </item>
         

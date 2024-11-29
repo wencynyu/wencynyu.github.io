@@ -2,160 +2,160 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/en/p/markdown-syntax-guide/</loc>
+    <loc>https://wencynyu.github.io/en/p/markdown-syntax-guide/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/"
+                href="https://wencynyu.github.io/zh-cn/p/markdown%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/markdown-syntax-guide/"
+                href="https://wencynyu.github.io/en/p/markdown-syntax-guide/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/p/image-gallery/</loc>
+    <loc>https://wencynyu.github.io/en/p/image-gallery/</loc>
     <lastmod>2023-08-26T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/"
+                href="https://wencynyu.github.io/zh-cn/p/%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD-%E5%B1%95%E7%A4%BA/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/image-gallery/"
+                href="https://wencynyu.github.io/en/p/image-gallery/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/p/shortcodes/</loc>
+    <loc>https://wencynyu.github.io/en/p/shortcodes/</loc>
     <lastmod>2023-08-25T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/"
+                href="https://wencynyu.github.io/zh-cn/p/%E5%A4%96%E9%93%BE%E4%BD%BF%E7%94%A8/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/shortcodes/"
+                href="https://wencynyu.github.io/en/p/shortcodes/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/p/math-typesetting/</loc>
+    <loc>https://wencynyu.github.io/en/p/math-typesetting/</loc>
     <lastmod>2023-08-24T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/%E6%95%B0%E5%AD%A6%E6%94%AF%E6%8C%81-latex/"
+                href="https://wencynyu.github.io/zh-cn/p/%E6%95%B0%E5%AD%A6%E6%94%AF%E6%8C%81-latex/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/math-typesetting/"
+                href="https://wencynyu.github.io/en/p/math-typesetting/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/</loc>
+    <loc>https://wencynyu.github.io/en/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/"
+                href="https://wencynyu.github.io/zh-cn/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/"
+                href="https://wencynyu.github.io/en/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/categories/</loc>
+    <loc>https://wencynyu.github.io/en/categories/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/categories/"
+                href="https://wencynyu.github.io/zh-cn/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/categories/"
+                href="https://wencynyu.github.io/en/categories/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/categories/front-end/</loc>
+    <loc>https://wencynyu.github.io/en/categories/front-end/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/en/post/</loc>
+    <loc>https://wencynyu.github.io/en/post/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/post/"
+                href="https://wencynyu.github.io/zh-cn/post/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/post/"
+                href="https://wencynyu.github.io/en/post/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/archives/</loc>
+    <loc>https://wencynyu.github.io/en/archives/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/archives/"
+                href="https://wencynyu.github.io/zh-cn/archives/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/archives/"
+                href="https://wencynyu.github.io/en/archives/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/page/</loc>
+    <loc>https://wencynyu.github.io/en/page/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/page/"
+                href="https://wencynyu.github.io/zh-cn/page/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/page/"
+                href="https://wencynyu.github.io/en/page/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/links/</loc>
+    <loc>https://wencynyu.github.io/en/links/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/links/"
+                href="https://wencynyu.github.io/zh-cn/links/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/links/"
+                href="https://wencynyu.github.io/en/links/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/search/</loc>
+    <loc>https://wencynyu.github.io/en/search/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/search/"
+                href="https://wencynyu.github.io/zh-cn/search/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/search/"
+                href="https://wencynyu.github.io/en/search/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/tags/</loc>
+    <loc>https://wencynyu.github.io/en/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/tags/"
+                href="https://wencynyu.github.io/zh-cn/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/tags/"
+                href="https://wencynyu.github.io/en/tags/"
                 />
   </url>
 </urlset>
