@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="redis高可用集群 sentinel（主从）集群 cluster（分布式）集群 主从集群 slaveof host指令：将当前redis服务实例置为指定host的从节点。\nslave节点发送sync请求至host主节点（master） master节点触发bgsave操作，将当前db数据全量更新至rdb二进制备份文件中 master节点完成rdb全量备份后，将其发送至slave节点 后续的增量写操作master会通过psync指令主动推送至slave节点 slave节点进行rdb数据加载 增量的psync数据主要通过slave节点的offset偏移量进行对比，有offset时仅同步增量数据 sentinel集群 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 typedef struct sentinelRedisInstance { int flags; /* 参见 SRI_... 定义 */ char *name; /* 当前 Sentinel 视角下的主节点名称 */ char *runid; /* 当前实例的运行ID，如果是 Sentinel 则为其唯一 ID */ uint64_t config_epoch; /* 配置纪元 */ sentinelAddr *addr; /* 主节点的地址 */ instanceLink *link; /* 与实例的连接，可能被多个 Sentinel 共享 */ mstime_t last_pub_time; /* 上次通过 Pub/Sub 发送 Hello 消息的时间 */ mstime_t last_hello_time; /* 仅当 SRI_SENTINEL 设置时有效，表示上次通过 Pub/Sub 收到 Hello 消息的时间 */ mstime_t last_master_down_reply_time; /* 上次回复 SENTINEL is-master-down 命令的时间 */ mstime_t s_down_since_time; /* 视为下线的时间（主观下线） */ mstime_t o_down_since_time; /* 视为下线的时间（客观下线） */ mstime_t down_after_period; /* 在此时间段后认为该节点下线 */ mstime_t master_reboot_down_after_period; /* 在此时间段后认为主节点重新启动后下线 */ mstime_t master_reboot_since_time; /* 主节点重启时间 */ mstime_t info_refresh; /* 上次接收到 INFO 输出的时间 */ dict *renamed_commands; /* 此实例中重命名的命令：Sentinel 将使用此表中的替代命令来执行操作，如 SLAVEOF、CONFIG、INFO 等 */ /* 节点角色及其首次观察时间。用于延迟替换实例报告的角色，避免在主节点报告新配置之前进行不必要的操作 */ int role_reported; mstime_t role_reported_time; mstime_t slave_conf_change_time; /* 上次从节点的主地址变化时间 */ /* 主节点特定字段 */ dict *sentinels; /* 监控相同主节点的其他 Sentinel */ dict *slaves; /* 当前主节点的从节点 */ unsigned int quorum;/* 需要多少个 Sentinel 达成共识才能认为主节点失败 */ int parallel_syncs; /* 同时重新配置的从节点数 */ /* 从节点特定字段 */ mstime_t master_link_down_time; /* 从节点与主节点的复制链路断开时间 */ int slave_priority; /* 从节点的优先级（由其 INFO 输出提供） */ int replica_announced; /* 从节点的状态是否已通过 INFO 输出进行公告 */ mstime_t slave_reconf_sent_time; /* 上次发送 SLAVE OF &lt;new&gt; 命令的时间 */ struct sentinelRedisInstance *master; /* 如果是从节点，指向主节点实例 */ char *slave_master_host; /* 从节点报告的主节点主机 */ int slave_master_port; /* 从节点报告的主节点端口 */ int slave_master_link_status; /* 从节点报告的主节点链路状态 */ unsigned long long slave_repl_offset; /* 从节点的复制偏移量 */ /* 故障转移相关 */ char *leader; /* 如果是主节点，该字段是应该执行故障转移的 Sentinel 的 runid。如果是 Sentinel，则是此 Sentinel 选举的领导者的 runid */ uint64_t leader_epoch; /* 领导者字段的纪元 */ uint64_t failover_epoch; /* 当前故障转移的纪元 */ int failover_state; /* 参见 SENTINEL_FAILOVER_STATE_* 定义 */ mstime_t failover_state_change_time; /* 故障转移状态变化的时间 */ mstime_t failover_start_time; /* 上次故障转移尝试开始的时间 */ mstime_t failover_timeout; /* 刷新故障转移状态的最大时间 */ mstime_t failover_delay_logged; /* 记录的故障转移开始时间 */ struct sentinelRedisInstance *promoted_slave; /* 被提升为主节点的从节点实例 */ sds info; /* 缓存的 INFO 输出 */ } sentinelRedisInstance; struct sentinelState { char myid[CONFIG_RUN_ID_SIZE+1]; /* 此 Sentinel 的 ID */ uint64_t current_epoch; /* 当前纪元 */ dict *masters; /* 监控的主节点字典。键是实例名称，值是 sentinelRedisInstance 结构体的指针 */ int tilt; /* 当前是否处于 TILT 模式？ */ int running_scripts; /* 当前正在执行的脚本数量 */ mstime_t tilt_start_time; /* TILT 模式开始的时间 */ mstime_t previous_time; /* 上次运行时间处理的时间 */ list *scripts_queue; /* 用户脚本的执行队列 */ char *announce_ip; /* 如果非 NULL，向其他 Sentinel 通告的 IP 地址 */ int announce_port; /* 如果非零，向其他 Sentinel 通告的端口 */ unsigned long simfailure_flags; /* 模拟故障标志 */ int resolve_hostnames; /* 是否支持使用主机名，假设 DNS 已正确配置 */ int announce_hostnames; /* 是否使用主机名而非 IP 地址通告给其他 Sentinel */ } sentinel; sentinel配置 Redis Sentinel 是一个独立的进程，通常和 Redis 实例在不同的机器上运行。我们需要至少三个 Sentinel 节点来保证集群的稳定性和故障转移功能。假设我们在以下机器上启动 Sentinel：\n">
 <title>高性能&amp;高可用 reids-分布式集群</title>
 
 <link rel='canonical' href='https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E9%AB%98%E5%8F%AF%E7%94%A8-reids-%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="高性能&高可用 reids-分布式集群">
-<meta property='og:description' content="">
+<meta property='og:description' content="redis高可用集群 sentinel（主从）集群 cluster（分布式）集群 主从集群 slaveof host指令：将当前redis服务实例置为指定host的从节点。\nslave节点发送sync请求至host主节点（master） master节点触发bgsave操作，将当前db数据全量更新至rdb二进制备份文件中 master节点完成rdb全量备份后，将其发送至slave节点 后续的增量写操作master会通过psync指令主动推送至slave节点 slave节点进行rdb数据加载 增量的psync数据主要通过slave节点的offset偏移量进行对比，有offset时仅同步增量数据 sentinel集群 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 typedef struct sentinelRedisInstance { int flags; /* 参见 SRI_... 定义 */ char *name; /* 当前 Sentinel 视角下的主节点名称 */ char *runid; /* 当前实例的运行ID，如果是 Sentinel 则为其唯一 ID */ uint64_t config_epoch; /* 配置纪元 */ sentinelAddr *addr; /* 主节点的地址 */ instanceLink *link; /* 与实例的连接，可能被多个 Sentinel 共享 */ mstime_t last_pub_time; /* 上次通过 Pub/Sub 发送 Hello 消息的时间 */ mstime_t last_hello_time; /* 仅当 SRI_SENTINEL 设置时有效，表示上次通过 Pub/Sub 收到 Hello 消息的时间 */ mstime_t last_master_down_reply_time; /* 上次回复 SENTINEL is-master-down 命令的时间 */ mstime_t s_down_since_time; /* 视为下线的时间（主观下线） */ mstime_t o_down_since_time; /* 视为下线的时间（客观下线） */ mstime_t down_after_period; /* 在此时间段后认为该节点下线 */ mstime_t master_reboot_down_after_period; /* 在此时间段后认为主节点重新启动后下线 */ mstime_t master_reboot_since_time; /* 主节点重启时间 */ mstime_t info_refresh; /* 上次接收到 INFO 输出的时间 */ dict *renamed_commands; /* 此实例中重命名的命令：Sentinel 将使用此表中的替代命令来执行操作，如 SLAVEOF、CONFIG、INFO 等 */ /* 节点角色及其首次观察时间。用于延迟替换实例报告的角色，避免在主节点报告新配置之前进行不必要的操作 */ int role_reported; mstime_t role_reported_time; mstime_t slave_conf_change_time; /* 上次从节点的主地址变化时间 */ /* 主节点特定字段 */ dict *sentinels; /* 监控相同主节点的其他 Sentinel */ dict *slaves; /* 当前主节点的从节点 */ unsigned int quorum;/* 需要多少个 Sentinel 达成共识才能认为主节点失败 */ int parallel_syncs; /* 同时重新配置的从节点数 */ /* 从节点特定字段 */ mstime_t master_link_down_time; /* 从节点与主节点的复制链路断开时间 */ int slave_priority; /* 从节点的优先级（由其 INFO 输出提供） */ int replica_announced; /* 从节点的状态是否已通过 INFO 输出进行公告 */ mstime_t slave_reconf_sent_time; /* 上次发送 SLAVE OF &lt;new&gt; 命令的时间 */ struct sentinelRedisInstance *master; /* 如果是从节点，指向主节点实例 */ char *slave_master_host; /* 从节点报告的主节点主机 */ int slave_master_port; /* 从节点报告的主节点端口 */ int slave_master_link_status; /* 从节点报告的主节点链路状态 */ unsigned long long slave_repl_offset; /* 从节点的复制偏移量 */ /* 故障转移相关 */ char *leader; /* 如果是主节点，该字段是应该执行故障转移的 Sentinel 的 runid。如果是 Sentinel，则是此 Sentinel 选举的领导者的 runid */ uint64_t leader_epoch; /* 领导者字段的纪元 */ uint64_t failover_epoch; /* 当前故障转移的纪元 */ int failover_state; /* 参见 SENTINEL_FAILOVER_STATE_* 定义 */ mstime_t failover_state_change_time; /* 故障转移状态变化的时间 */ mstime_t failover_start_time; /* 上次故障转移尝试开始的时间 */ mstime_t failover_timeout; /* 刷新故障转移状态的最大时间 */ mstime_t failover_delay_logged; /* 记录的故障转移开始时间 */ struct sentinelRedisInstance *promoted_slave; /* 被提升为主节点的从节点实例 */ sds info; /* 缓存的 INFO 输出 */ } sentinelRedisInstance; struct sentinelState { char myid[CONFIG_RUN_ID_SIZE+1]; /* 此 Sentinel 的 ID */ uint64_t current_epoch; /* 当前纪元 */ dict *masters; /* 监控的主节点字典。键是实例名称，值是 sentinelRedisInstance 结构体的指针 */ int tilt; /* 当前是否处于 TILT 模式？ */ int running_scripts; /* 当前正在执行的脚本数量 */ mstime_t tilt_start_time; /* TILT 模式开始的时间 */ mstime_t previous_time; /* 上次运行时间处理的时间 */ list *scripts_queue; /* 用户脚本的执行队列 */ char *announce_ip; /* 如果非 NULL，向其他 Sentinel 通告的 IP 地址 */ int announce_port; /* 如果非零，向其他 Sentinel 通告的端口 */ unsigned long simfailure_flags; /* 模拟故障标志 */ int resolve_hostnames; /* 是否支持使用主机名，假设 DNS 已正确配置 */ int announce_hostnames; /* 是否使用主机名而非 IP 地址通告给其他 Sentinel */ } sentinel; sentinel配置 Redis Sentinel 是一个独立的进程，通常和 Redis 实例在不同的机器上运行。我们需要至少三个 Sentinel 节点来保证集群的稳定性和故障转移功能。假设我们在以下机器上启动 Sentinel：\n">
 <meta property='og:url' content='https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BD%E9%AB%98%E5%8F%AF%E7%94%A8-reids-%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4/'>
 <meta property='og:site_name' content='wenxin-blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-09-15T00:47:54&#43;08:00'/><meta property='article:modified_time' content='2024-09-15T00:47:54&#43;08:00'/>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-10-20T01:23:56&#43;08:00'/><meta property='article:modified_time' content='2024-10-20T01:23:56&#43;08:00'/>
 <meta name="twitter:title" content="高性能&高可用 reids-分布式集群">
-<meta name="twitter:description" content="">
+<meta name="twitter:description" content="redis高可用集群 sentinel（主从）集群 cluster（分布式）集群 主从集群 slaveof host指令：将当前redis服务实例置为指定host的从节点。\nslave节点发送sync请求至host主节点（master） master节点触发bgsave操作，将当前db数据全量更新至rdb二进制备份文件中 master节点完成rdb全量备份后，将其发送至slave节点 后续的增量写操作master会通过psync指令主动推送至slave节点 slave节点进行rdb数据加载 增量的psync数据主要通过slave节点的offset偏移量进行对比，有offset时仅同步增量数据 sentinel集群 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 typedef struct sentinelRedisInstance { int flags; /* 参见 SRI_... 定义 */ char *name; /* 当前 Sentinel 视角下的主节点名称 */ char *runid; /* 当前实例的运行ID，如果是 Sentinel 则为其唯一 ID */ uint64_t config_epoch; /* 配置纪元 */ sentinelAddr *addr; /* 主节点的地址 */ instanceLink *link; /* 与实例的连接，可能被多个 Sentinel 共享 */ mstime_t last_pub_time; /* 上次通过 Pub/Sub 发送 Hello 消息的时间 */ mstime_t last_hello_time; /* 仅当 SRI_SENTINEL 设置时有效，表示上次通过 Pub/Sub 收到 Hello 消息的时间 */ mstime_t last_master_down_reply_time; /* 上次回复 SENTINEL is-master-down 命令的时间 */ mstime_t s_down_since_time; /* 视为下线的时间（主观下线） */ mstime_t o_down_since_time; /* 视为下线的时间（客观下线） */ mstime_t down_after_period; /* 在此时间段后认为该节点下线 */ mstime_t master_reboot_down_after_period; /* 在此时间段后认为主节点重新启动后下线 */ mstime_t master_reboot_since_time; /* 主节点重启时间 */ mstime_t info_refresh; /* 上次接收到 INFO 输出的时间 */ dict *renamed_commands; /* 此实例中重命名的命令：Sentinel 将使用此表中的替代命令来执行操作，如 SLAVEOF、CONFIG、INFO 等 */ /* 节点角色及其首次观察时间。用于延迟替换实例报告的角色，避免在主节点报告新配置之前进行不必要的操作 */ int role_reported; mstime_t role_reported_time; mstime_t slave_conf_change_time; /* 上次从节点的主地址变化时间 */ /* 主节点特定字段 */ dict *sentinels; /* 监控相同主节点的其他 Sentinel */ dict *slaves; /* 当前主节点的从节点 */ unsigned int quorum;/* 需要多少个 Sentinel 达成共识才能认为主节点失败 */ int parallel_syncs; /* 同时重新配置的从节点数 */ /* 从节点特定字段 */ mstime_t master_link_down_time; /* 从节点与主节点的复制链路断开时间 */ int slave_priority; /* 从节点的优先级（由其 INFO 输出提供） */ int replica_announced; /* 从节点的状态是否已通过 INFO 输出进行公告 */ mstime_t slave_reconf_sent_time; /* 上次发送 SLAVE OF &lt;new&gt; 命令的时间 */ struct sentinelRedisInstance *master; /* 如果是从节点，指向主节点实例 */ char *slave_master_host; /* 从节点报告的主节点主机 */ int slave_master_port; /* 从节点报告的主节点端口 */ int slave_master_link_status; /* 从节点报告的主节点链路状态 */ unsigned long long slave_repl_offset; /* 从节点的复制偏移量 */ /* 故障转移相关 */ char *leader; /* 如果是主节点，该字段是应该执行故障转移的 Sentinel 的 runid。如果是 Sentinel，则是此 Sentinel 选举的领导者的 runid */ uint64_t leader_epoch; /* 领导者字段的纪元 */ uint64_t failover_epoch; /* 当前故障转移的纪元 */ int failover_state; /* 参见 SENTINEL_FAILOVER_STATE_* 定义 */ mstime_t failover_state_change_time; /* 故障转移状态变化的时间 */ mstime_t failover_start_time; /* 上次故障转移尝试开始的时间 */ mstime_t failover_timeout; /* 刷新故障转移状态的最大时间 */ mstime_t failover_delay_logged; /* 记录的故障转移开始时间 */ struct sentinelRedisInstance *promoted_slave; /* 被提升为主节点的从节点实例 */ sds info; /* 缓存的 INFO 输出 */ } sentinelRedisInstance; struct sentinelState { char myid[CONFIG_RUN_ID_SIZE+1]; /* 此 Sentinel 的 ID */ uint64_t current_epoch; /* 当前纪元 */ dict *masters; /* 监控的主节点字典。键是实例名称，值是 sentinelRedisInstance 结构体的指针 */ int tilt; /* 当前是否处于 TILT 模式？ */ int running_scripts; /* 当前正在执行的脚本数量 */ mstime_t tilt_start_time; /* TILT 模式开始的时间 */ mstime_t previous_time; /* 上次运行时间处理的时间 */ list *scripts_queue; /* 用户脚本的执行队列 */ char *announce_ip; /* 如果非 NULL，向其他 Sentinel 通告的 IP 地址 */ int announce_port; /* 如果非零，向其他 Sentinel 通告的端口 */ unsigned long simfailure_flags; /* 模拟故障标志 */ int resolve_hostnames; /* 是否支持使用主机名，假设 DNS 已正确配置 */ int announce_hostnames; /* 是否使用主机名而非 IP 地址通告给其他 Sentinel */ } sentinel; sentinel配置 Redis Sentinel 是一个独立的进程，通常和 Redis 实例在不同的机器上运行。我们需要至少三个 Sentinel 节点来保证集群的稳定性和故障转移功能。假设我们在以下机器上启动 Sentinel：\n">
     <link rel="shortcut icon" href="/favicon.png" />
 
     </head>
@@ -249,7 +249,67 @@
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#主从集群">主从集群</a>
+      <ol>
+        <li><a href="#sentinel集群">sentinel集群</a>
+          <ol>
+            <li><a href="#sentinel配置">sentinel配置</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#分布式集群">分布式集群</a>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#cluster配置">cluster配置</a></li>
+          </ol>
+        </li>
+        <li><a href="#gossip分布式传播算法">gossip分布式传播算法</a></li>
+      </ol>
+    </li>
+    <li><a href="#选主流程">选主流程</a>
+      <ol>
+        <li><a href="#主节点故障后的选举过程">主节点故障后的选举过程</a>
+          <ol>
+            <li><a href="#1-故障检测">1. <strong>故障检测</strong></a></li>
+            <li><a href="#2-节点故障确认">2. <strong>节点故障确认</strong></a></li>
+            <li><a href="#3-选举新的主节点">3. <strong>选举新的主节点</strong></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -298,7 +358,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Sep 15, 2024</time>
+                <time class="article-time--published">Oct 20, 2024</time>
             </div>
         
 
@@ -313,7 +373,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 0 分钟
+                    阅读时长: 9 分钟
                 </time>
             </div>
         
@@ -328,7 +388,470 @@
     <section class="article-content">
     
     
-    
+    <h1 id="redis高可用集群">redis高可用集群
+</h1><ul>
+<li>sentinel（主从）集群</li>
+<li>cluster（分布式）集群</li>
+</ul>
+<h2 id="主从集群">主从集群
+</h2><p>slaveof host指令：将当前redis服务实例置为指定host的从节点。</p>
+<ul>
+<li>slave节点发送<code>sync</code>请求至host主节点（master）</li>
+<li>master节点触发bgsave操作，将当前db数据全量更新至rdb二进制备份文件中</li>
+<li>master节点完成rdb全量备份后，将其发送至slave节点
+<ul>
+<li>后续的增量写操作master会通过<code>psync</code>指令主动推送至slave节点</li>
+</ul>
+</li>
+<li>slave节点进行rdb数据加载
+<ul>
+<li>增量的psync数据主要通过slave节点的offset偏移量进行对比，有offset时仅同步增量数据</li>
+</ul>
+</li>
+</ul>
+<h3 id="sentinel集群">sentinel集群
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">sentinelRedisInstance</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>      <span class="cm">/* 参见 SRI_... 定义 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>     <span class="cm">/* 当前 Sentinel 视角下的主节点名称 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">runid</span><span class="p">;</span>    <span class="cm">/* 当前实例的运行ID，如果是 Sentinel 则为其唯一 ID */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="n">config_epoch</span><span class="p">;</span>  <span class="cm">/* 配置纪元 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sentinelAddr</span> <span class="o">*</span><span class="n">addr</span><span class="p">;</span> <span class="cm">/* 主节点的地址 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">instanceLink</span> <span class="o">*</span><span class="n">link</span><span class="p">;</span> <span class="cm">/* 与实例的连接，可能被多个 Sentinel 共享 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">last_pub_time</span><span class="p">;</span>   <span class="cm">/* 上次通过 Pub/Sub 发送 Hello 消息的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">last_hello_time</span><span class="p">;</span> <span class="cm">/* 仅当 SRI_SENTINEL 设置时有效，表示上次通过 Pub/Sub 收到 Hello 消息的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">last_master_down_reply_time</span><span class="p">;</span> <span class="cm">/* 上次回复 SENTINEL is-master-down 命令的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">s_down_since_time</span><span class="p">;</span> <span class="cm">/* 视为下线的时间（主观下线） */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">o_down_since_time</span><span class="p">;</span> <span class="cm">/* 视为下线的时间（客观下线） */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">down_after_period</span><span class="p">;</span> <span class="cm">/* 在此时间段后认为该节点下线 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">master_reboot_down_after_period</span><span class="p">;</span> <span class="cm">/* 在此时间段后认为主节点重新启动后下线 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">master_reboot_since_time</span><span class="p">;</span> <span class="cm">/* 主节点重启时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">info_refresh</span><span class="p">;</span>  <span class="cm">/* 上次接收到 INFO 输出的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dict</span> <span class="o">*</span><span class="n">renamed_commands</span><span class="p">;</span>     <span class="cm">/* 此实例中重命名的命令：Sentinel 将使用此表中的替代命令来执行操作，如 SLAVEOF、CONFIG、INFO 等 */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/* 节点角色及其首次观察时间。用于延迟替换实例报告的角色，避免在主节点报告新配置之前进行不必要的操作 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">role_reported</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">role_reported_time</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">slave_conf_change_time</span><span class="p">;</span> <span class="cm">/* 上次从节点的主地址变化时间 */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/* 主节点特定字段 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dict</span> <span class="o">*</span><span class="n">sentinels</span><span class="p">;</span>    <span class="cm">/* 监控相同主节点的其他 Sentinel */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dict</span> <span class="o">*</span><span class="n">slaves</span><span class="p">;</span>       <span class="cm">/* 当前主节点的从节点 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">quorum</span><span class="p">;</span><span class="cm">/* 需要多少个 Sentinel 达成共识才能认为主节点失败 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">parallel_syncs</span><span class="p">;</span> <span class="cm">/* 同时重新配置的从节点数 */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/* 从节点特定字段 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">master_link_down_time</span><span class="p">;</span> <span class="cm">/* 从节点与主节点的复制链路断开时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">slave_priority</span><span class="p">;</span> <span class="cm">/* 从节点的优先级（由其 INFO 输出提供） */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">replica_announced</span><span class="p">;</span> <span class="cm">/* 从节点的状态是否已通过 INFO 输出进行公告 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">slave_reconf_sent_time</span><span class="p">;</span> <span class="cm">/* 上次发送 SLAVE OF &lt;new&gt; 命令的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">sentinelRedisInstance</span> <span class="o">*</span><span class="n">master</span><span class="p">;</span> <span class="cm">/* 如果是从节点，指向主节点实例 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">slave_master_host</span><span class="p">;</span>    <span class="cm">/* 从节点报告的主节点主机 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">slave_master_port</span><span class="p">;</span>      <span class="cm">/* 从节点报告的主节点端口 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">slave_master_link_status</span><span class="p">;</span> <span class="cm">/* 从节点报告的主节点链路状态 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">slave_repl_offset</span><span class="p">;</span> <span class="cm">/* 从节点的复制偏移量 */</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="cm">/* 故障转移相关 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">leader</span><span class="p">;</span>       <span class="cm">/* 如果是主节点，该字段是应该执行故障转移的 Sentinel 的 runid。如果是 Sentinel，则是此 Sentinel 选举的领导者的 runid */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="n">leader_epoch</span><span class="p">;</span> <span class="cm">/* 领导者字段的纪元 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="n">failover_epoch</span><span class="p">;</span> <span class="cm">/* 当前故障转移的纪元 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">failover_state</span><span class="p">;</span> <span class="cm">/* 参见 SENTINEL_FAILOVER_STATE_* 定义 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">failover_state_change_time</span><span class="p">;</span> <span class="cm">/* 故障转移状态变化的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">failover_start_time</span><span class="p">;</span>   <span class="cm">/* 上次故障转移尝试开始的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">failover_timeout</span><span class="p">;</span>      <span class="cm">/* 刷新故障转移状态的最大时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">failover_delay_logged</span><span class="p">;</span> <span class="cm">/* 记录的故障转移开始时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">sentinelRedisInstance</span> <span class="o">*</span><span class="n">promoted_slave</span><span class="p">;</span> <span class="cm">/* 被提升为主节点的从节点实例 */</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">sds</span> <span class="n">info</span><span class="p">;</span> <span class="cm">/* 缓存的 INFO 输出 */</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">sentinelRedisInstance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">sentinelState</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">myid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span> <span class="cm">/* 此 Sentinel 的 ID */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="n">current_epoch</span><span class="p">;</span>         <span class="cm">/* 当前纪元 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dict</span> <span class="o">*</span><span class="n">masters</span><span class="p">;</span>      <span class="cm">/* 监控的主节点字典。键是实例名称，值是 sentinelRedisInstance 结构体的指针 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">tilt</span><span class="p">;</span>           <span class="cm">/* 当前是否处于 TILT 模式？ */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">running_scripts</span><span class="p">;</span>    <span class="cm">/* 当前正在执行的脚本数量 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">tilt_start_time</span><span class="p">;</span>       <span class="cm">/* TILT 模式开始的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mstime_t</span> <span class="n">previous_time</span><span class="p">;</span>         <span class="cm">/* 上次运行时间处理的时间 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">list</span> <span class="o">*</span><span class="n">scripts_queue</span><span class="p">;</span>            <span class="cm">/* 用户脚本的执行队列 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">announce_ip</span><span class="p">;</span>  <span class="cm">/* 如果非 NULL，向其他 Sentinel 通告的 IP 地址 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">announce_port</span><span class="p">;</span>  <span class="cm">/* 如果非零，向其他 Sentinel 通告的端口 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">simfailure_flags</span><span class="p">;</span> <span class="cm">/* 模拟故障标志 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">resolve_hostnames</span><span class="p">;</span>       <span class="cm">/* 是否支持使用主机名，假设 DNS 已正确配置 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">announce_hostnames</span><span class="p">;</span>      <span class="cm">/* 是否使用主机名而非 IP 地址通告给其他 Sentinel */</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">sentinel</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="sentinel配置">sentinel配置
+</h4><p>Redis Sentinel 是一个独立的进程，通常和 Redis 实例在不同的机器上运行。我们需要至少三个 Sentinel 节点来保证集群的稳定性和故障转移功能。假设我们在以下机器上启动 Sentinel：</p>
+<ul>
+<li>
+<p>Redis 主节点：<code>192.168.1.10:6379</code></p>
+</li>
+<li>
+<p>Redis 从节点 1：<code>192.168.1.11:6379</code></p>
+</li>
+<li>
+<p>Redis 从节点 2：<code>192.168.1.12:6379</code></p>
+</li>
+<li>
+<p>Sentinel 1：<code>192.168.1.20:26379</code></p>
+</li>
+<li>
+<p>Sentinel 2：<code>192.168.1.21:26379</code></p>
+</li>
+<li>
+<p>Sentinel 3：<code>192.168.1.22:26379</code></p>
+</li>
+</ul>
+<p>新建sentinel.conf</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="na">port 26379</span>
+</span></span><span class="line"><span class="cl"><span class="na">daemonize yes</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 配置监控的主节点</span>
+</span></span><span class="line"><span class="cl"><span class="na">sentinel monitor master 192.168.1.10 6379 2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 配置故障转移的参数</span>
+</span></span><span class="line"><span class="cl"><span class="na">sentinel down-after-milliseconds master 5000</span>
+</span></span><span class="line"><span class="cl"><span class="na">sentinel parallel-syncs master 1</span>
+</span></span><span class="line"><span class="cl"><span class="na">sentinel failover-timeout master 60000</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">redis-server /path/to/sentinel.conf --sentinel
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="分布式集群">分布式集群
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">struct _clusterNode {
+</span></span><span class="line"><span class="cl">    mstime_t ctime; /* 节点对象的创建时间。 */
+</span></span><span class="line"><span class="cl">    char name[CLUSTER_NAMELEN]; /* 节点名称，十六进制字符串，大小为 sha1 的长度。 */
+</span></span><span class="line"><span class="cl">    char shard_id[CLUSTER_NAMELEN]; /* 分片ID，十六进制字符串，大小为 sha1 的长度。 */
+</span></span><span class="line"><span class="cl">    int flags;      /* 节点的标志，可能是 CLUSTER_NODE_... */
+</span></span><span class="line"><span class="cl">    uint64_t configEpoch; /* 节点最后观察到的配置纪元（configEpoch）。 */
+</span></span><span class="line"><span class="cl">    unsigned char slots[CLUSTER_SLOTS / 8]; /* 当前节点负责的槽位。 */
+</span></span><span class="line"><span class="cl">    uint16_t *slot_info_pairs; /* 以 (start/end) 对的形式表示的槽位信息（连续的槽位索引）。 */
+</span></span><span class="line"><span class="cl">    int slot_info_pairs_count; /* slot_info_pairs 中已使用的槽位数量。 */
+</span></span><span class="line"><span class="cl">    int numslots;   /* 当前节点负责的槽位数量。 */
+</span></span><span class="line"><span class="cl">    int numslaves;  /* 如果该节点是主节点，则为其从节点的数量。 */
+</span></span><span class="line"><span class="cl">    clusterNode **slaves; /* 当前节点的从节点指针数组。 */
+</span></span><span class="line"><span class="cl">    clusterNode *slaveof; /* 指向主节点的指针。如果当前节点是从节点但没有在表中找到主节点，可能为 NULL。 */
+</span></span><span class="line"><span class="cl">    unsigned long long last_in_ping_gossip; /* 上次通过 PING 消息中传播的 gossip 编号。 */
+</span></span><span class="line"><span class="cl">    mstime_t ping_sent;      /* 最近一次发送 PING 消息的时间。 */
+</span></span><span class="line"><span class="cl">    mstime_t pong_received;  /* 最近一次收到 PONG 响应的时间。 */
+</span></span><span class="line"><span class="cl">    mstime_t data_received;  /* 最近一次收到数据的时间。 */
+</span></span><span class="line"><span class="cl">    mstime_t fail_time;      /* 节点状态被设置为 FAIL 的时间。 */
+</span></span><span class="line"><span class="cl">    mstime_t voted_time;     /* 最近一次为当前主节点的某个从节点投票的时间。 */
+</span></span><span class="line"><span class="cl">    mstime_t repl_offset_time;  /* 接收到当前节点的复制偏移量的时间。 */
+</span></span><span class="line"><span class="cl">    mstime_t orphaned_time;     /* 节点变为孤立主节点的起始时间。 */
+</span></span><span class="line"><span class="cl">    long long repl_offset;      /* 当前节点的最后已知复制偏移量。 */
+</span></span><span class="line"><span class="cl">    char ip[NET_IP_STR_LEN];    /* 当前节点的最新已知 IP 地址。 */
+</span></span><span class="line"><span class="cl">    sds hostname;               /* 当前节点的已知主机名。 */
+</span></span><span class="line"><span class="cl">    sds human_nodename;         /* 当前节点的可读主机名（人类可读）。 */
+</span></span><span class="line"><span class="cl">    int tcp_port;               /* 当前节点的客户端 TCP 端口。 */
+</span></span><span class="line"><span class="cl">    int tls_port;               /* 当前节点的客户端 TLS 端口。 */
+</span></span><span class="line"><span class="cl">    int cport;                  /* 当前节点的集群通信端口。 */
+</span></span><span class="line"><span class="cl">    clusterLink *link;          /* 当前节点到其他节点的 TCP/IP 链接。 */
+</span></span><span class="line"><span class="cl">    clusterLink *inbound_link;  /* 当前节点从其他节点接受的 TCP/IP 链接。 */
+</span></span><span class="line"><span class="cl">    list *fail_reports;         /* 报告当前节点为故障节点的其他节点列表。 */
+</span></span><span class="line"><span class="cl">};
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">struct clusterState {
+</span></span><span class="line"><span class="cl">    clusterNode *myself;  /* 当前节点的指针。 */
+</span></span><span class="line"><span class="cl">    uint64_t currentEpoch; /* 当前集群的纪元（epoch）。 */
+</span></span><span class="line"><span class="cl">    int state;            /* 当前集群的状态，如 CLUSTER_OK, CLUSTER_FAIL 等。 */
+</span></span><span class="line"><span class="cl">    int size;             /* 至少拥有一个槽位的主节点数量。 */
+</span></span><span class="line"><span class="cl">    dict *nodes;          /* 节点名称到 clusterNode 结构体的哈希表。 */
+</span></span><span class="line"><span class="cl">    dict *shards;         /* 分片ID到节点列表的哈希表。 */
+</span></span><span class="line"><span class="cl">    dict *nodes_black_list; /* 临时不重新添加的节点黑名单。 */
+</span></span><span class="line"><span class="cl">    clusterNode *migrating_slots_to[CLUSTER_SLOTS]; /* 正在迁移的槽位的目标节点。 */
+</span></span><span class="line"><span class="cl">    clusterNode *importing_slots_from[CLUSTER_SLOTS]; /* 正在导入的槽位的源节点。 */
+</span></span><span class="line"><span class="cl">    clusterNode *slots[CLUSTER_SLOTS]; /* 集群槽位到节点的映射。 */
+</span></span><span class="line"><span class="cl">    /* 以下字段用于从节点参与选举时的状态管理。 */
+</span></span><span class="line"><span class="cl">    mstime_t failover_auth_time; /* 上一次或下一次选举的时间。 */
+</span></span><span class="line"><span class="cl">    int failover_auth_count;    /* 当前已收到的选票数量。 */
+</span></span><span class="line"><span class="cl">    int failover_auth_sent;     /* 是否已经请求过选票。 */
+</span></span><span class="line"><span class="cl">    int failover_auth_rank;     /* 当前从节点在选举中的排名。 */
+</span></span><span class="line"><span class="cl">    uint64_t failover_auth_epoch; /* 当前选举的纪元。 */
+</span></span><span class="line"><span class="cl">    int cant_failover_reason;   /* 当前从节点无法进行故障转移的原因。见 CANT_FAILOVER_* 宏。 */
+</span></span><span class="line"><span class="cl">    /* 手动故障转移状态： */
+</span></span><span class="line"><span class="cl">    mstime_t mf_end;            /* 手动故障转移的时间限制（毫秒时间戳），如果没有正在进行的故障转移则为零。 */
+</span></span><span class="line"><span class="cl">    /* 主节点的手动故障转移状态。 */
+</span></span><span class="line"><span class="cl">    clusterNode *mf_slave;      /* 执行手动故障转移的从节点。 */
+</span></span><span class="line"><span class="cl">    /* 从节点的手动故障转移状态。 */
+</span></span><span class="line"><span class="cl">    long long mf_master_offset; /* 从节点需要的主节点偏移量，-1 表示尚未接收到偏移量。 */
+</span></span><span class="line"><span class="cl">    int mf_can_start;           /* 如果非零，表示可以开始请求主节点投票。 */
+</span></span><span class="line"><span class="cl">    /* 以下字段用于主节点参与选举时的状态管理。 */
+</span></span><span class="line"><span class="cl">    uint64_t lastVoteEpoch;     /* 上一次投票授权的纪元。 */
+</span></span><span class="line"><span class="cl">    int todo_before_sleep; /* 在集群进入休眠前需要执行的操作。 */
+</span></span><span class="line"><span class="cl">    /* 统计信息 */
+</span></span><span class="line"><span class="cl">    /* 按类型统计的消息发送和接收数量。 */
+</span></span><span class="line"><span class="cl">    long long stats_bus_messages_sent[CLUSTERMSG_TYPE_COUNT];
+</span></span><span class="line"><span class="cl">    long long stats_bus_messages_received[CLUSTERMSG_TYPE_COUNT];
+</span></span><span class="line"><span class="cl">    long long stats_pfail_nodes;    /* PFAIL 状态下的节点数量（不包括没有地址的节点）。 */
+</span></span><span class="line"><span class="cl">    unsigned long long stat_cluster_links_buffer_limit_exceeded;  /* 由于超过缓冲区限制而释放的集群链接总数。 */
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    /* 在槽位迁移期间，节点停止声明拥有某个槽位时，通过 PING 消息传播的槽位所有权状态。 */
+</span></span><span class="line"><span class="cl">    unsigned char owner_not_claiming_slot[CLUSTER_SLOTS / 8];
+</span></span><span class="line"><span class="cl">};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="cluster配置">cluster配置
+</h4><p>修改原有的redis.conf配置，开启集群模式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="na">cluster-enabled yes</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">## 根据192.168.1.10 ~ 192.168.1.15六台redis服务实例，创建一个1副本的集群</span>
+</span></span><span class="line"><span class="cl">redis-cli --cluster create 192.168.1.10:6379 192.168.1.11:6379 192.168.1.12:6379 192.168.1.13:6379 192.168.1.14:6379 192.168.1.15:6379 --cluster-replicas <span class="m">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## 检查集群状态</span>
+</span></span><span class="line"><span class="cl">redis-cli -h 192.168.1.10 -p <span class="m">6379</span> cluster info
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## 集群扩缩容</span>
+</span></span><span class="line"><span class="cl">redis-cli --cluster add-node 192.168.1.16:6379 192.168.1.10:6379
+</span></span><span class="line"><span class="cl">redis-cli --cluster del-node 192.168.1.16:6379 192.168.1.10:6379
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## rehash重新分配hash槽</span>
+</span></span><span class="line"><span class="cl">redis-cli --cluster reshard 192.168.1.10:6379
+</span></span><span class="line"><span class="cl"><span class="c1">## 系统会提示你按以下步骤进行：</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## 选择迁移的槽的数量</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## 选择要迁移的源节点</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## 选择目标节点</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="gossip分布式传播算法">gossip分布式传播算法
+</h3><ul>
+<li>主要用于AP模式的分布式集群</li>
+<li>节点之间会定期发送 <code>PING</code> 请求，以检查彼此的健康状况。如果某个节点未能在指定时间内回复 <code>PONG</code>，它将被标记为“故障”节点（此时仅标记，不进入故障流程）
+<ul>
+<li>超过半数以上的主观下线 -&gt; 客观下线，进入节点故障流程</li>
+</ul>
+</li>
+</ul>
+<h2 id="选主流程">选主流程
+</h2><h3 id="主节点故障后的选举过程">主节点故障后的选举过程
+</h3><p>当 Redis 集群的主节点（Master）发生故障时，集群通过以下步骤来选举新的主节点：</p>
+<h4 id="1-故障检测">1. <strong>故障检测</strong>
+</h4><ul>
+<li>Redis 集群中的每个节点定期通过 <strong>Gossip 协议</strong>（基于 <code>PING</code>/<code>PONG</code> 消息）来相互检查对方的状态。如果一个节点长时间未响应其他节点的心跳消息，或者无法访问该节点时，该节点会被标记为故障节点。</li>
+<li>节点之间也会通过 <strong>fail reports</strong>（失败报告）来相互通知某个节点的失败状态。如果一个节点在多次心跳中没有响应，它会被标记为 <code>PFAIL</code>（可能失败）状态。这个状态会传播给其他节点。</li>
+</ul>
+<h4 id="2-节点故障确认">2. <strong>节点故障确认</strong>
+</h4><ul>
+<li>当集群中的一个主节点失败时，其他节点会观察到该节点长时间没有响应，且处于 <code>PFAIL</code> 状态。</li>
+<li>一旦故障被确认，集群中的其他节点会开始启动故障转移（failover）流程，选举新的主节点。</li>
+</ul>
+<h4 id="3-选举新的主节点">3. <strong>选举新的主节点</strong>
+</h4><ul>
+<li>故障转移的选举过程是通过 <strong>从节点投票</strong> 来完成的。每个主节点都有一个或多个从节点，这些从节点可以参与选举过程。</li>
+<li>如果主节点故障，集群会尝试从它的从节点中选举出一个新的主节点。选举的步骤如下：
+<ol>
+<li><strong>候选条件</strong>：从节点需要满足以下条件才能被选为新的主节点：
+<ul>
+<li>从节点必须是主节点的有效复制副本，且与主节点的数据同步。</li>
+<li>从节点的复制偏移量必须接近主节点的最后复制偏移量，确保数据不会丢失太多。</li>
+<li>从节点的 <code>configEpoch</code> 和其他选举相关的条件（如 <code>voted_time</code>）也会被检查。</li>
+</ul>
+</li>
+<li><strong>投票</strong>：所有与故障主节点关联的从节点都会进行投票，选择一个从节点成为新的主节点。投票的依据通常是复制偏移量、节点的健康状态以及当前选举的纪元（<code>configEpoch</code>）等。</li>
+<li><strong>选举成功</strong>：一旦一个从节点收到了多数节点的投票，它会被提升为新的主节点。这个过程会被广播到整个集群，并更新节点状态。新选举出来的主节点会开始负责处理它原来从主节点负责的槽位。</li>
+</ol>
+</li>
+</ul>
+
 </section>
 
 
