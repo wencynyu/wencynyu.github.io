@@ -7,34 +7,10 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>yuwenxin</copyright>
-        <lastBuildDate>Sun, 15 Sep 2024 00:59:34 +0800</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/categories/rdbms/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>高性能MySql-事务与xlog</title>
-        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</link>
-        <pubDate>Sun, 15 Sep 2024 00:59:34 +0800</pubDate>
-        
-        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>高性能MySql-索引</title>
-        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</link>
-        <pubDate>Sun, 15 Sep 2024 00:58:54 +0800</pubDate>
-        
-        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>高性能MySql-通信</title>
-        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</link>
-        <pubDate>Sun, 15 Sep 2024 00:58:40 +0800</pubDate>
-        
-        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</guid>
-        <description></description>
-        </item>
-        <item>
+        <lastBuildDate>Wed, 18 Sep 2024 00:58:29 +0800</lastBuildDate><atom:link href="https://wencynyu.github.io/zh-cn/categories/rdbms/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>高性能MySql-概览</title>
         <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</link>
-        <pubDate>Sun, 15 Sep 2024 00:58:29 +0800</pubDate>
+        <pubDate>Wed, 18 Sep 2024 00:58:29 +0800</pubDate>
         
         <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E6%A6%82%E8%A7%88/</guid>
         <description>&lt;h2 id=&#34;mysql概览&#34;&gt;MySQL概览
@@ -1451,6 +1427,30 @@
 &lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/mysql/mysql-server/tree/8.4/sql&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://github.com/mysql/mysql-server/tree/8.4/sql&lt;/a&gt;&lt;/p&gt;
 </description>
+        </item>
+        <item>
+        <title>高性能MySql-事务与xlog</title>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</link>
+        <pubDate>Sun, 15 Sep 2024 00:59:34 +0800</pubDate>
+        
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>高性能MySql-索引</title>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</link>
+        <pubDate>Sun, 15 Sep 2024 00:58:54 +0800</pubDate>
+        
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E7%B4%A2%E5%BC%95/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>高性能MySql-通信</title>
+        <link>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</link>
+        <pubDate>Sun, 15 Sep 2024 00:58:40 +0800</pubDate>
+        
+        <guid>https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E9%80%9A%E4%BF%A1/</guid>
+        <description></description>
         </item>
         
     </channel>
