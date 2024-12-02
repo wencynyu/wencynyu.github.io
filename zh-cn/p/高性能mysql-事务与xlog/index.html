@@ -10,7 +10,7 @@
 <meta property='og:description' content="高性能MySql 事务与xlog">
 <meta property='og:url' content='https://wencynyu.github.io/zh-cn/p/%E9%AB%98%E6%80%A7%E8%83%BDmysql-%E4%BA%8B%E5%8A%A1%E4%B8%8Exlog/'>
 <meta property='og:site_name' content='wenxin-blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-09-15T00:59:34&#43;08:00'/><meta property='article:modified_time' content='2024-09-15T00:59:34&#43;08:00'/>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-12-03T00:59:34&#43;08:00'/><meta property='article:modified_time' content='2024-12-03T00:59:34&#43;08:00'/>
 <meta name="twitter:title" content="高性能MySql-事务与xlog">
 <meta name="twitter:description" content="高性能MySql 事务与xlog">
     <link rel="shortcut icon" href="/favicon.png" />
@@ -249,7 +249,48 @@
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#innodb">innoDB</a>
+      <ol>
+        <li><a href="#架构">架构</a></li>
+        <li><a href="#源码分析">源码分析</a>
+          <ol>
+            <li><a href="#index-page结构">index page结构</a></li>
+            <li><a href="#事务与xlog流程分析">事务与XLog流程分析</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -298,7 +339,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Sep 15, 2024</time>
+                <time class="article-time--published">Dec 03, 2024</time>
             </div>
         
 
@@ -313,7 +354,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 0 分钟
+                    阅读时长: 9 分钟
                 </time>
             </div>
         
@@ -328,7 +369,1041 @@
     <section class="article-content">
     
     
-    
+    <h1 id="mysql-事务与xlogredobinundo">Mysql 事务与XLog（redo/bin/undo）
+</h1><h2 id="innodb">innoDB
+</h2><ul>
+<li>事务支持ACID</li>
+<li>mvcc</li>
+<li>行锁</li>
+<li>redolog（仅innoDB） &amp; undolog</li>
+<li>.ibd文件存索引+数据
+<ul>
+<li>InnoDB的文件结构可以划分为多个<strong>段（segment）、区（extent）、页（page）等层级</strong>。每个索引都存储在特定的段中，而每个段又由多个区组成，每个区包含多个页。在InnoDB中，<strong>页是磁盘和内存之间交换数据的最小单位</strong>，通常是16KB大小。</li>
+</ul>
+</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature</th>
+          <th style="text-align: left">Support</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">B-tree indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Clustered indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Compressed data</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Data caches</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Foreign key support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Full-text search indexes</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial data type support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Geospatial indexing support</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Hash indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Index caches</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Locking granularity</td>
+          <td style="text-align: left">Row</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">MVCC</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Storage limits</td>
+          <td style="text-align: left">64TB</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">T-tree indexes</td>
+          <td style="text-align: left">No</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Transactions</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Update statistics for data dictionary</td>
+          <td style="text-align: left">Yes</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="架构">架构
+</h3><p><img src="https://dev.mysql.com/doc/refman/8.4/en/images/innodb-architecture-8-0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="innodb-arch"
+	
+	
+></p>
+<h3 id="源码分析">源码分析
+</h3><h4 id="index-page结构">index page结构
+</h4><p>每一个index page默认16KB。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">结构名称</th>
+          <th style="text-align: left">字节大小</th>
+          <th style="text-align: left">描述</th>
+          <th style="text-align: left">文件位置</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>FIL Header</strong></td>
+          <td style="text-align: left">38</td>
+          <td style="text-align: left">页面文件头，包含页面的元数据</td>
+          <td style="text-align: left"><code>fil0fil.cc</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>INDEX Header</strong></td>
+          <td style="text-align: left">36</td>
+          <td style="text-align: left">页面头，包含页面的基本信息，如类型、级别等</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>FSEG Header</strong></td>
+          <td style="text-align: left">20</td>
+          <td style="text-align: left">索引页头，包含索引页的特定信息</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>System Record</strong><br>（Infimum &amp; Supermum）</td>
+          <td style="text-align: left">26</td>
+          <td style="text-align: left">存储页中记录的目录结构</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>User Record</strong></td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">存储实际索引记录的数据堆</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Free Space</strong></td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">管理页面中的空闲空间</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Page Directory</strong></td>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">页面中的虚拟记录，用于 B+ 树的边界</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>FIL Tailer</strong></td>
+          <td style="text-align: left">8</td>
+          <td style="text-align: left">描述页面压缩的相关信息</td>
+          <td style="text-align: left"><code>page0types.h</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<h5 id="元数据">元数据
+</h5><ul>
+<li>FIL Header &amp; Tailer</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cm">/** MySQL-4.0.14版本中页面所属的空间ID（== 0），但在后续版本中是页面的“新”校验和 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_SPACE_OR_CHKSUM</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** checksum 4字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_OFFSET</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** IndexPage偏移量 4字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_PREV</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 前一个IndexPage的地址 4字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_NEXT</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 后一个IndexPage的地址 4字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_LSN</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 最新修改日志记录的结束LSN信息 8字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_TYPE</span> <span class="o">=</span> <span class="mi">24</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** PageType信息 2字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_FILE_FLUSH_LSN</span> <span class="o">=</span> <span class="mi">26</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 仅在系统表空间的第一页中定义：文件至少已刷新到此LSN 8字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_ARCH_LOG_NO_OR_SPACE_ID</span> <span class="o">=</span> <span class="mi">34</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** SpaceId 4字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_DATA</span> <span class="o">=</span> <span class="mi">38</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 文件页面尾部 */</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 其中低4字节用于存储页面校验和，最后4字节应该与 `FIL_PAGE_LSN` 的最后4字节相同 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_END_LSN_OLD_CHKSUM</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 如果页面类型是 `FIL_PAGE_COMPRESSED`，则从 `FIL_PAGE_FILE_FLUSH_LSN` 开始的8个字节按以下方式分解： */</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 控制信息版本格式（u8） */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_VERSION</span> <span class="o">=</span> <span class="n">FIL_PAGE_FILE_FLUSH_LSN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 压缩算法（u8） */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_ALGORITHM_V1</span> <span class="o">=</span> <span class="n">FIL_PAGE_VERSION</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 原始页面类型（u16） */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_ORIGINAL_TYPE_V1</span> <span class="o">=</span> <span class="n">FIL_PAGE_ALGORITHM_V1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 原始数据大小（以字节为单位）（u16）*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_ORIGINAL_SIZE_V1</span> <span class="o">=</span> <span class="n">FIL_PAGE_ORIGINAL_TYPE_V1</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 压缩后的大小（u16） */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_PAGE_COMPRESS_SIZE_V1</span> <span class="o">=</span> <span class="n">FIL_PAGE_ORIGINAL_SIZE_V1</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 该字段重载了 `FIL_PAGE_FILE_FLUSH_LSN` 用于R树分裂序列号 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">FIL_RTREE_SPLIT_SEQ_NUM</span> <span class="o">=</span> <span class="n">FIL_PAGE_FILE_FLUSH_LSN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** 一个包装类，用于帮助打印和检查文件页面头部 */</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">Fil_page_header</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 构造函数，接受指向页面头的指针作为参数 */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">explicit</span> <span class="nf">Fil_page_header</span><span class="p">(</span><span class="k">const</span> <span class="n">byte</span> <span class="o">*</span><span class="n">frame</span><span class="p">)</span> <span class="o">:</span> <span class="nf">m_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 从页面头获取空间ID */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">space_id_t</span> <span class="nf">get_space_id</span><span class="p">()</span> <span class="k">const</span> <span class="n">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 从页面头获取页面编号 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">page_no_t</span> <span class="nf">get_page_no</span><span class="p">()</span> <span class="k">const</span> <span class="n">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取 `FIL_PAGE_PREV` 字段的值 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">page_no_t</span> <span class="nf">get_page_prev</span><span class="p">()</span> <span class="k">const</span> <span class="n">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取 `FIL_PAGE_NEXT` 字段的值 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">page_no_t</span> <span class="nf">get_page_next</span><span class="p">()</span> <span class="k">const</span> <span class="n">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 从页面头获取页面类型 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint16_t</span> <span class="nf">get_page_type</span><span class="p">()</span> <span class="k">const</span> <span class="n">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="nl">private</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 指向页面头的指针 */</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="n">byte</span> <span class="o">*</span><span class="n">m_frame</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>INDEX Header &amp; FSEG Header（PAGE Header）</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_HEADER</span> <span class="o">=</span> <span class="n">FSEG_PAGE_DATA</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 索引页面头部的起始偏移量：从FIL_HEADER偏移位置38开始 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_N_DIR_SLOTS</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 页面目录中插槽的数量 2字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_HEAP_TOP</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 指向记录堆顶部的指针 2字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_N_HEAP</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 堆中的记录数量，bit 15 = 标志位 2字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_FREE</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 指向页面空闲记录列表的起始位置 2字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_GARBAGE</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 已删除记录的字节数 2字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_LAST_INSERT</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 最后插入的记录的指针 2字节；如果信息已通过删除重置，则为NULL */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_DIRECTION</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 最后插入的方向：PAGE_LEFT，...枚举值 2字节*/</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_N_DIRECTION</span> <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 向同一方向连续插入的记录数 2字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_N_RECS</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 页面上的用户记录数 2字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_MAX_TRX_ID</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 修改页面上记录的事务的最大事务ID；trx_id_t；仅在二级索引和插入缓冲树中定义 2字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_LEVEL</span> <span class="o">=</span> <span class="mi">26</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 索引树节点的层级 2字节，叶子节点为 0 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_INDEX_ID</span> <span class="o">=</span> <span class="mi">28</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 页面所属的索引ID 8字节 */</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** B树中叶子页的文件段头部：仅在B树的根页面中定义，而不在插入缓冲树的根页面中 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_BTR_SEG_LEAF</span> <span class="o">=</span> <span class="mi">36</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_BTR_IBUF_FREE_LIST</span> <span class="o">=</span> <span class="n">PAGE_BTR_SEG_LEAF</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_BTR_IBUF_FREE_LIST_NODE</span> <span class="o">=</span> <span class="n">PAGE_BTR_SEG_LEAF</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/* 在PAGE_BTR_SEG_LEAF和PAGE_BTR_SEG_TOP的位置中，
+</span></span></span><span class="line"><span class="cl"><span class="cm">	如果页面是插入缓冲树的根页面，则此处会存储一个空闲列表基础节点；
+</span></span></span><span class="line"><span class="cl"><span class="cm">	如果页面在自由列表中，则该位置会存储自由列表节点 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_BTR_SEG_TOP</span> <span class="o">=</span> <span class="mi">36</span> <span class="o">+</span> <span class="n">FSEG_HEADER_SIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/* B树中非叶子页的文件段头部：仅在B树的根页面中定义，而不在插入缓冲树的根页面中 */</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** 页面数据的起始位置 */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">PAGE_DATA</span> <span class="o">=</span> <span class="n">PAGE_HEADER</span> <span class="o">+</span> <span class="mi">36</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">FSEG_HEADER_SIZE</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>System Record（Infimum &amp; Supermum）</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="cm">/** 老页面(mysql 5.1之前)的下界记录的偏移量  */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define PAGE_OLD_INFIMUM (PAGE_DATA + 1 + REC_N_OLD_EXTRA_BYTES) </span><span class="c1">// 1 + 6
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cm">/** 老页面的上界记录的偏移量 */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define PAGE_OLD_SUPREMUM (PAGE_DATA + 2 + 2 * REC_N_OLD_EXTRA_BYTES + 8) </span><span class="c1">// 2 + 2 * 6 + 8
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cm">/** 老页面的上界记录结束的偏移量 */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define PAGE_OLD_SUPREMUM_END (PAGE_OLD_SUPREMUM + 9) </span><span class="c1">// 2 + 2 * 6 + 8 + 9 = 31
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cm">/** 新页面的下界记录的偏移量 */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define PAGE_NEW_INFIMUM (PAGE_DATA + REC_N_NEW_EXTRA_BYTES) </span><span class="c1">// 5
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cm">/** 新页面的上界记录的偏移量 */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define PAGE_NEW_SUPREMUM (PAGE_DATA + 2 * REC_N_NEW_EXTRA_BYTES + 8) </span><span class="c1">// 2 * 5 + 8
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cm">/** 新页面的上界记录结束的偏移量 */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define PAGE_NEW_SUPREMUM_END (PAGE_NEW_SUPREMUM + 8) </span><span class="c1">// 2 * 5 + 8 + 8 = 26
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h5 id="实际索引数据">实际索引数据
+</h5><ul>
+<li>Record Header
+<ul>
+<li>老版本：16bit: pointer to next record + 13bit: heap_no + 4bit: n_owned + 10bit: col_size + 1bit: short_flag + 4bit: info (6B)</li>
+<li>新版本：16bit: pointer to next record + 13bit: heap_no + 4bit: n_owned + 3bit: status + 4bit: info (5B)</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cm">/* Maximum values for various fields (for non-blob tuples) */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">REC_MAX_N_FIELDS</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">REC_MAX_HEAP_NO</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">8192</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">REC_MAX_N_OWNED</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** row id: a 48-bit integer */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">DATA_ROW_ID</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** stored length for row id */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">uint32_t</span> <span class="n">DATA_ROW_ID_LEN</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** Transaction id: 6 bytes */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">size_t</span> <span class="n">DATA_TRX_ID</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** Transaction ID type size in bytes. */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">size_t</span> <span class="n">DATA_TRX_ID_LEN</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/** Rollback data pointer: 7 bytes */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">size_t</span> <span class="n">DATA_ROLL_PTR</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** Rollback data pointer type size in bytes. */</span>
+</span></span><span class="line"><span class="cl"><span class="n">constexpr</span> <span class="kt">size_t</span> <span class="n">DATA_ROLL_PTR_LEN</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/* Offsets of the bit-fields in an old-style record. NOTE! In the table the
+</span></span></span><span class="line"><span class="cl"><span class="cm">most significant bytes and bits are written below less significant.
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">        (1) byte offset         (2) bit usage within byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        downward from
+</span></span></span><span class="line"><span class="cl"><span class="cm">        origin -&gt;       1       8 bits pointer to next record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        2       8 bits pointer to next record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        3       1 bit short flag
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                7 bits number of fields
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        4       3 bits number of fields
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                5 bits heap number
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        5       8 bits heap number
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        6       4 bits n_owned
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                4 bits info bits
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/* Offsets of the bit-fields in a new-style record. NOTE! In the table the
+</span></span></span><span class="line"><span class="cl"><span class="cm">most significant bytes and bits are written below less significant.
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">        (1) byte offset         (2) bit usage within byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        downward from
+</span></span></span><span class="line"><span class="cl"><span class="cm">        origin -&gt;       1       8 bits relative offset of next record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        2       8 bits relative offset of next record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  the relative offset is an unsigned 16-bit
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  integer:
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  (offset_of_next_record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                   - offset_of_this_record) mod 64Ki,
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  where mod is the modulo as a non-negative
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  number;
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  we can calculate the offset of the next
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  record with the formula:
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  relative_offset + offset_of_this_record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                  mod UNIV_PAGE_SIZE
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        3       3 bits status:
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                        000=conventional record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                        001=node pointer record (inside B-tree)
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                        010=infimum record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                        011=supremum record
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                        1xx=reserved
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                5 bits heap number
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        4       8 bits heap number
+</span></span></span><span class="line"><span class="cl"><span class="cm">                        5       4 bits n_owned
+</span></span></span><span class="line"><span class="cl"><span class="cm">                                4 bits info bits
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h5 id="transaction数据">transaction数据
+</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cm">/** Mini-事务句柄和缓冲区 */</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="kt">mtr_t</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** mtr 的状态变量 */</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">Impl</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 锁等的备忘栈 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mtr_buf_t</span> <span class="n">m_memo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** mini-事务日志 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mtr_buf_t</span> <span class="n">m_log</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 如果在 ibuf 更改中 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">m_inside_ibuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 如果 mini-事务可能修改了缓冲池页面 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">m_modifications</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 如果 mini-事务被强制设置为 NO_LOG 模式，因为全局禁用了重做日志 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">m_marked_nolog</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 启动时用于递增全局计数器的 shard 索引 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">size_t</span> <span class="n">m_shard_index</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 已经写入 mtr 日志的初始页面记录数 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint32_t</span> <span class="n">m_n_log_recs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 指定应该记录的操作；默认值是 MTR_LOG_ALL */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mtr_log_t</span> <span class="n">m_log_mode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 事务的状态 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mtr_state_t</span> <span class="n">m_state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 刷新观察者 */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Flush_observer</span> <span class="o">*</span><span class="n">m_flush_observer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/** 所有者 mini-事务 */</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">mtr_t</span> <span class="o">*</span><span class="n">m_mtr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">mtr_t</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_impl</span><span class="p">.</span><span class="n">m_state</span> <span class="o">=</span> <span class="n">MTR_STATE_INIT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_impl</span><span class="p">.</span><span class="n">m_marked_nolog</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_impl</span><span class="p">.</span><span class="n">m_shard_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="o">~</span><span class="kt">mtr_t</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 启动一个 mini-事务
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param sync           如果是同步 mini-事务，则为 true */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">start</span><span class="p">(</span><span class="kt">bool</span> <span class="n">sync</span> <span class="o">=</span> <span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** @return 判断是否为异步 mini-事务 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_async</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span><span class="o">!</span><span class="n">m_sync</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 请求未来的提交是同步的 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">set_sync</span><span class="p">()</span> <span class="p">{</span> <span class="n">m_sync</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 提交 mini-事务 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">commit</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取当前缓冲区大小
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return       保存点 */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ulint</span> <span class="nf">get_savepoint</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="nf">is_active</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_magic_n</span> <span class="o">==</span> <span class="n">MTR_MAGIC_N</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_memo</span><span class="p">.</span><span class="nf">size</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 释放 mtr 备忘栈中的 (索引树) s-latch */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">release_s_latch_at_savepoint</span><span class="p">(</span><span class="n">ulint</span> <span class="n">savepoint</span><span class="p">,</span> <span class="kt">rw_lock_t</span> <span class="o">*</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 释放 mtr 备忘栈中的块 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">release_block_at_savepoint</span><span class="p">(</span><span class="n">ulint</span> <span class="n">savepoint</span><span class="p">,</span> <span class="kt">buf_block_t</span> <span class="o">*</span><span class="n">block</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 在保存点后为尚未加锁的块加 SX-latch */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">sx_latch_at_savepoint</span><span class="p">(</span><span class="n">ulint</span> <span class="n">savepoint</span><span class="p">,</span> <span class="kt">buf_block_t</span> <span class="o">*</span><span class="n">block</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 在保存点后为尚未加锁的块加 X-latch */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">x_latch_at_savepoint</span><span class="p">(</span><span class="n">ulint</span> <span class="n">savepoint</span><span class="p">,</span> <span class="kt">buf_block_t</span> <span class="o">*</span><span class="n">block</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取日志模式
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return       日志模式 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">mtr_log_t</span> <span class="nf">get_log_mode</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 设置日志模式
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param mode    日志模式
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return       旧的日志模式 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">mtr_log_t</span> <span class="nf">set_log_mode</span><span class="p">(</span><span class="kt">mtr_log_t</span> <span class="n">mode</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 从缓冲池中读取 1 - 4 字节
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param ptr    读取起始位置
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param type   MLOG_1BYTE, MLOG_2BYTES, MLOG_4BYTES
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return       读取的值 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="nf">read_ulint</span><span class="p">(</span><span class="k">const</span> <span class="n">byte</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                           <span class="kt">mlog_id_t</span> <span class="n">type</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 锁定一个 rw-latch（共享模式）
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param lock   rw-lock
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param location 锁定来源位置 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">s_lock</span><span class="p">(</span><span class="kt">rw_lock_t</span> <span class="o">*</span><span class="n">lock</span><span class="p">,</span> <span class="n">ut</span><span class="o">::</span><span class="n">Location</span> <span class="n">location</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 锁定一个 rw-latch（独占模式）
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param lock   rw-lock
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param location 锁定来源位置 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">x_lock</span><span class="p">(</span><span class="kt">rw_lock_t</span> <span class="o">*</span><span class="n">lock</span><span class="p">,</span> <span class="n">ut</span><span class="o">::</span><span class="n">Location</span> <span class="n">location</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 锁定一个 rw-latch（SX 模式）
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param lock   rw-lock
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param location 锁定来源位置 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">sx_lock</span><span class="p">(</span><span class="kt">rw_lock_t</span> <span class="o">*</span><span class="n">lock</span><span class="p">,</span> <span class="n">ut</span><span class="o">::</span><span class="n">Location</span> <span class="n">location</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取表空间的 X-latch
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param[in]    space           表空间实例
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param[in]    location        来源位置 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">x_lock_space</span><span class="p">(</span><span class="kt">fil_space_t</span> <span class="o">*</span><span class="n">space</span><span class="p">,</span> <span class="n">ut</span><span class="o">::</span><span class="n">Location</span> <span class="n">location</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 释放备忘栈中的对象
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param object 对象
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param type   对象类型：MTR_MEMO_S_LOCK 等 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">memo_release</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">object</span><span class="p">,</span> <span class="n">ulint</span> <span class="n">type</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 释放页面锁 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">release_page</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">mtr_memo_type_t</span> <span class="n">type</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 标记 mini-事务可能修改了缓冲池页面 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">set_modified</span><span class="p">()</span> <span class="p">{</span> <span class="n">m_impl</span><span class="p">.</span><span class="n">m_modifications</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 判断 mtr 是否修改了缓冲池页面
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return 如果 mini-事务可能修改了缓冲池页面，则返回 true */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">has_modifications</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">m_impl</span><span class="p">.</span><span class="n">m_modifications</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取提交时的 LSN
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return 提交时的 LSN
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @retval 0 如果事务只修改了临时表空间或全局禁用了日志 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">lsn_t</span> <span class="nf">commit_lsn</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="nf">has_committed</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_log_mode</span> <span class="o">==</span> <span class="n">MTR_LOG_ALL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">m_commit_lsn</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 进入变更缓冲区代码 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">enter_ibuf</span><span class="p">()</span> <span class="p">{</span> <span class="n">m_impl</span><span class="p">.</span><span class="n">m_inside_ibuf</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 退出变更缓冲区代码 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">exit_ibuf</span><span class="p">()</span> <span class="p">{</span> <span class="n">m_impl</span><span class="p">.</span><span class="n">m_inside_ibuf</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** @return 如果当前在变更缓冲区代码中 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_inside_ibuf</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_inside_ibuf</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** @return mini-事务是否处于活动状态 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_active</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_state</span> <span class="o">==</span> <span class="n">MTR_STATE_ACTIVE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取刷新观察者
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return 刷新观察者 */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Flush_observer</span> <span class="o">*</span><span class="nf">get_flush_observer</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_flush_observer</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 设置刷新观察者
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param[in]    observer        刷新观察者 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">set_flush_observer</span><span class="p">(</span><span class="n">Flush_observer</span> <span class="o">*</span><span class="n">observer</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="n">observer</span> <span class="o">==</span> <span class="n">nullptr</span> <span class="o">||</span> <span class="n">m_impl</span><span class="p">.</span><span class="n">m_log_mode</span> <span class="o">==</span> <span class="n">MTR_LOG_NO_REDO</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">m_impl</span><span class="p">.</span><span class="n">m_flush_observer</span> <span class="o">=</span> <span class="n">observer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 打印 mini-事务的备忘对象（mtr_memo_slot_t）到输出流
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param[in]   out   输出流
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return 输出流 */</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">ostream</span> <span class="o">&amp;</span><span class="nf">print_memos</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ostream</span> <span class="o">&amp;</span><span class="n">out</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 标记日志记录已被添加 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">added_rec</span><span class="p">()</span> <span class="p">{</span> <span class="o">++</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_n_log_recs</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 检查是否有任何重做日志记录应在提交时写入重做日志
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return 如果至少有一个重做日志记录生成，则返回 true */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">has_any_log_record</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">m_impl</span><span class="p">.</span><span class="n">m_n_log_recs</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取当前 mini-事务的缓冲区重做日志
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return       重做日志 */</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="kt">mtr_buf_t</span> <span class="o">*</span><span class="nf">get_log</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_magic_n</span> <span class="o">==</span> <span class="n">MTR_MAGIC_N</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_log</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 获取当前 mini-事务的缓冲区重做日志
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @return       重做日志 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">mtr_buf_t</span> <span class="o">*</span><span class="nf">get_log</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ut_ad</span><span class="p">(</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_magic_n</span> <span class="o">==</span> <span class="n">MTR_MAGIC_N</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">m_impl</span><span class="p">.</span><span class="n">m_log</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 将对象推入 mtr 备忘栈
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param object 对象
+</span></span></span><span class="line"><span class="cl"><span class="cm">  @param type   对象类型：MTR_MEMO_S_LOCK 等 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">memo_push</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">object</span><span class="p">,</span> <span class="kt">mtr_memo_type_t</span> <span class="n">type</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 矩阵检查是否应该忽略模式更新请求 */</span>
+</span></span><span class="line"><span class="cl">  <span class="k">static</span> <span class="kt">bool</span> <span class="n">s_mode_update</span><span class="p">[</span><span class="n">MTR_LOG_MODE_MAX</span><span class="p">][</span><span class="n">MTR_LOG_MODE_MAX</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="nl">private</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Impl</span> <span class="n">m_impl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 提交时的 LSN */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">lsn_t</span> <span class="n">m_commit_lsn</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/** 是否为同步 mini-事务 */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">m_sync</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">class</span> <span class="n">Command</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">friend</span> <span class="n">class</span> <span class="n">Command</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="事务与xlog流程分析">事务与XLog流程分析
+</h4><ol>
+<li>start transaction</li>
+<li>do operation</li>
+<li>commit
+<ul>
+<li>BufferPool写入operation数据，数据页DoubleWriteBuffer（读作buffer，实际为磁盘顺序写操作，避免16k内存页写入4k磁盘页非原子操作失败）</li>
+<li>两阶段-1：写入redo_log，此时transaction为prepare阶段</li>
+<li>两阶段-2：（写入bin_log，非innoDB引擎层）实际完成commit</li>
+</ul>
+</li>
+<li>rollback
+<ul>
+<li>transaction_id + rollback_ptr回滚指针，通过undo_log进行逆操作，回滚数据</li>
+</ul>
+</li>
+</ol>
+
 </section>
 
 
