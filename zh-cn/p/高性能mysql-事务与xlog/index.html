@@ -282,6 +282,7 @@
         </li>
       </ol>
     </li>
+    <li><a href="#mtr的使用">mtr的使用</a></li>
   </ol>
 </nav>
         </div>
@@ -354,7 +355,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 9 分钟
+                    阅读时长: 17 分钟
                 </time>
             </div>
         
@@ -1403,7 +1404,251 @@
 </ul>
 </li>
 </ol>
-
+<h2 id="mtr的使用">mtr的使用
+</h2><p>在开启一个mini transaction时，会初始化mtr对象中的m_log和m_memo成员，设置m_state为active。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mtr_t::start
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; 初始化mtr.m_impl-&gt;m_log日志管理对象
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; 初始化mtr.m_impl-&gt;m_memo锁管理对象
+</span></span><span class="line"><span class="cl">  |   m_log和m_memo都是mtr_buf_t，以block_t节点m_node域构建的双向链表
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; m_log_mode=MTR_LOG_ALL(记录所有的数据变更) &amp; m_state=MTR_STATE_ACTIVE
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>提交一个mini transaction的过程比较复杂，大致流程是先将m_log中的日志写入公共log buffer，再将m_memo中的加锁并且发生修改的脏page加入flush list，最后释放m_memo中的所有锁。</p>
+<p>公共log buffer是按照log block格式存储的（包含12B的header和4B的trailer，详见<a class="link" href="http://mysql.taobao.org/monthly/2017/09/07/"  target="_blank" rel="noopener"
+    >前文</a>中的日志块结构），每个log block大小为512B，并且持久化时以512B进行对齐。每个log block中能存储日志内容的空间为512-12-4=496B。</p>
+<p>公共log buffer有个原子变量log.sn，其统计的是公共buffer中曾经存储过的日志内容的大小。通过sn可以很容易计算出对应的lsn，其统计的是公共buffer中曾经存储过的以log block格式的日志量的大小。 lsn = (sn / 496 * 512 + sn % 512 + 12)</p>
+<p>公共log buffer是个循环buffer，其中有三个重要的位点log.write_lsn，log.sn对应的lsn，log.buf_limit_sn对应的lsn。其中log.write_lsn表示已写入磁盘的日志位点（不要求flush），log.sn对应的lsn表示已占位待拷贝的日志位点，log.buf_limit_sn对应的lsn表示可以占位的最大日志位点。满足log.write_lsn &lt;= log.sn对应的lsn &lt;= log.buf_limit_sn对应的lsn。</p>
+<p>将m_log中的日志写入公共log buffer：</p>
+<ul>
+<li>根据日志数m_n_log_recs是否为1，来判断是single log还是multiple log。对于single log，在日志的开头的日志类型字段中增加MLOG_SINGLE_REC_FLAG。而对于multiple log，在日志结尾增加1B的MLOG_MULTI_REC_END。</li>
+<li>在公共log buffer中使用原子变量log.sn进行日志占位。</li>
+<li>在往已占位的日志空间中拷贝日志前，有以下两种情况需要等待：
+<ul>
+<li>若当前的log.sn位点被SN_LOCKED锁定，则要等待log.sn_locked 超过占位前的log.sn。当公共log buffer需要在线变更大小的时候，会进行SN_LOCKED加锁。</li>
+<li>若日志写入速度过快，来不及写磁盘，就会把log buffer占满，这时需要阻塞等待日志的写磁盘。</li>
+</ul>
+</li>
+<li>将m_log动态buffer拷贝到公共log buffer，是按照512B大小的buffer粒度进行拷贝的：
+<ul>
+<li>若日志长度超过log block剩余大小，则要做截断，并增加tail和新的header，以满足log block格式</li>
+<li>若写到log buffer的结尾（默认大小为16M），要继续转向log buffer开头继续拷贝。由于log buffer大小是log block的倍数，所以这里不需要再次做截断。</li>
+<li>每个buffer拷贝完成后触发一次log.recent_written的Link_buf更新（详见前文），log.recent_written记录完成拷贝的最大连续日志的lsn</li>
+</ul>
+</li>
+<li>当m_log日志都写完，要检查已写入的日志是否横跨log block，若横跨了，则要在结尾的log block的header的LOG_BLOCK_FIRST_REC_GROUP字段中标识新mtr的位点end_lsn。</li>
+</ul>
+<p>将m_memo中的加锁并且发生修改的脏page加入flush list：</p>
+<ul>
+<li>遍历m_memo动态buffer中的每个buffer中的每个锁对象mtr_memo_slot_t
+<ul>
+<li>若是page锁，且该page发生了修改，则将该page加入flush list</li>
+</ul>
+</li>
+<li>触发一次log.recent_closed的Link_buf更新，log.recent_closed记录添加到flush list的最大连续日志的lsn</li>
+</ul>
+<p>以下是详细流程图：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">mtr_t::commit
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; mtr_t::Command
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">(m_n_log_recs&gt;0 || m_modifications)
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; (yes)
+</span></span><span class="line"><span class="cl">  |	    v
+</span></span><span class="line"><span class="cl">  |   Command::execute 	  将mtr.m_impl-&gt;m_log写入公共log buffer，把脏页加入flush list
+</span></span><span class="line"><span class="cl">  |	    |
+</span></span><span class="line"><span class="cl">  |   	|-&gt; prepare_write
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; 若 mtr.m_impl-&gt;m_log_mode为 MTR_LOG_NO_REDO或MTR_LOG_NONE，则直接返回
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; 若 mtr.m_impl-&gt;m_n_log_recs==1，则 m_log.front()-&gt;begin()|=MLOG_SINGLE_REC_FLAG，在日志头Type字段中标识，
+</span></span><span class="line"><span class="cl">  |     |         否则 m_log-&gt;push(MLOG_MULTI_REC_END)，在日志结尾附加1B
+</span></span><span class="line"><span class="cl">  |	    |
+</span></span><span class="line"><span class="cl">  |   	|-&gt; log_buffer_reserve      在公共log buffer中为日志预留空
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; log_buffer_s_lock_enter_reserve
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; 对 log.pfs_psi加 s-lock
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; log.sn.fetch_add(mtr.m_impl-&gt;m_log.m_size)     在公共的log buffer中占位
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; log_buffer_s_lock_wait     若log.sn被SN_LOCKED，则等待log.sn_locked 超过占位前的log.sn
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; log_translate_sn_to_lsn      将日志内容的偏移量log.sn 转为log block格式的偏移量start_lsn，start_lsn可以唯一表示日志在log block和公共log buffer中的位置
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; log_wait_for_space_after_reserving     若end_sn &gt; log.buf_limit_sn，则等待
+</span></span><span class="line"><span class="cl">  |	    |
+</span></span><span class="line"><span class="cl">  |   	|-&gt; mtr_write_log_t(mtr.m_impl-&gt;m_log.m_list)    将日志内容拷贝至预留的空间
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |   (loop mtr_buf_t::block in m_list)   将mtr.m_impl-&gt;m_log中的日志按block粒度拷贝到公共log buffer
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; log_buffer_write      以log block的 start_lsn%OS_FILE_LOG_BLOCK_SIZE位置的数据 拷贝到公共log buffer的 start_lsn%log.buf_size位置
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; left = OS_FILE_LOG_BLOCK_SIZE - LOG_BLOCK_TRL_SIZE - offset     若日志长度超过log block剩余大小，则要做截断
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; lsn_diff = left + LOG_BLOCK_TRL_SIZE + LOG_BLOCK_HDR_SIZE       若log block写满，要增加tail和新的header
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; 若公共log buffer被写满，则下次从开头继续写。因为每个mtr的日志在解析时大小就不超过2M，肯定不会超过公共log buffer的大小16M
+</span></span><span class="line"><span class="cl">  |     |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |     |-&gt; log_block_set_first_rec_group    在新header中设置 LOG_BLOCK_FIRST_REC_GROUP为0
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; log_buffer_set_first_record_group      若mtr日志都写完且 mtr开头和结尾不在同一个log block中，则在新header中设置 LOG_BLOCK_FIRST_REC_GROUP为 end_lsn
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; log_buffer_write_completed    每个block拷贝完成后均触发一次Link_buf(并查集)的更新，log.recent_written记录完成拷贝的最大连续日志的lsn
+</span></span><span class="line"><span class="cl">  |     |           |
+</span></span><span class="line"><span class="cl">  |     |           |-&gt; log.recent_written.add_link_advance_tail     在recent_written-&gt;m_links的slot中记录当前日志的end_lsn，m_tail表示已拷贝到log buffer连续日志的end_lsn
+</span></span><span class="line"><span class="cl">  |     |           |     |
+</span></span><span class="line"><span class="cl">  |     |           |     |-&gt; 若m_tail为当前日志的start_lsn，则推进m_tail为当期日志的end_lsn
+</span></span><span class="line"><span class="cl">  |     |           |     |
+</span></span><span class="line"><span class="cl">  |     |           |     |-&gt; 否则recent_written-&gt;m_links[start_lsn%capacity] = end_lsn，并推进m_tail
+</span></span><span class="line"><span class="cl">  |     |           |           v
+</span></span><span class="line"><span class="cl">  |     |           |         log.recent_written.advance_tail_until   等到log.recent_written.m_tail推进到最大lsn
+</span></span><span class="line"><span class="cl">  |     |           |           |
+</span></span><span class="line"><span class="cl">  |     |           |           |-&gt; 若recent_written-&gt;m_links[m_tail%capacity] &gt; m_tail，则使用cas更改recent_written-&gt;m_links[m_tail%capacity] = m_tail 来排他访问
+</span></span><span class="line"><span class="cl">  |     |           |           |
+</span></span><span class="line"><span class="cl">  |     |           |           |-&gt; (loop next_position)    推进m_tail为此刻连续的最大lsn，即使没推进到当前日志，其它help线程会帮忙推进
+</span></span><span class="line"><span class="cl">  |     |           |
+</span></span><span class="line"><span class="cl">  |     |           |-&gt; 若log.recent_written.m_tail &gt; log.current_ready_waiting_lsn，则os_event_set(log.closer_event)
+</span></span><span class="line"><span class="cl">  |	    |
+</span></span><span class="line"><span class="cl">  |   	|-&gt; add_dirty_blocks_to_flush_list(mtr.m_impl-&gt;m_memo)      将mtr锁管理中记录的脏页加入flush list
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |   (reverse loop mtr_buf_t::block in m_memo)
+</span></span><span class="line"><span class="cl">  |     |     v
+</span></span><span class="line"><span class="cl">  |     |   (reverse loop mtr_memo_slot_t in block)
+</span></span><span class="line"><span class="cl">  |     |     |
+</span></span><span class="line"><span class="cl">  |     |     |-&gt; add_to_flush     为了去掉flush_order_mutex，把mtr对应的脏页无序的添加到flush list，在做checkpoint时, 无法保证flush list 上面最头的page lsn是最小的
+</span></span><span class="line"><span class="cl">  |     |           v
+</span></span><span class="line"><span class="cl">  |     |         add_dirty_page_to_flush_list    把修改后的page加入flush list，当mtr_memo_slot_t.type为MTR_MEMO_PAGE_X_FIX或MTR_MEMO_PAGE_SX_FIX，
+</span></span><span class="line"><span class="cl">  |     |           |                             或为MTR_MEMO_BUF_FIX，且mtr_memo_slot_t.object-&gt;made_dirty_with_no_latch
+</span></span><span class="line"><span class="cl">  |     |           v
+</span></span><span class="line"><span class="cl">  |     |         buf_flush_note_modification(mtr_memo_slot_t.object)
+</span></span><span class="line"><span class="cl">  |	    |
+</span></span><span class="line"><span class="cl">  |   	|-&gt; log_buffer_close       将mtr锁管理中记录的脏页处理完后触发一次Link_buf更新，log.recent_closed记录添加到flush list的最大连续日志的lsn
+</span></span><span class="line"><span class="cl">  |           |                    以log.recent_closed.m_tail的lsn来做checkpoint肯定是安全的，
+</span></span><span class="line"><span class="cl">  |           v
+</span></span><span class="line"><span class="cl">  |         log_buffer_s_lock_exit_close
+</span></span><span class="line"><span class="cl">  |           |
+</span></span><span class="line"><span class="cl">  |           |-&gt; 对 log.pfs_psi解锁 s-lock
+</span></span><span class="line"><span class="cl">  |           |
+</span></span><span class="line"><span class="cl">  |           |-&gt; log.recent_closed.add_link_advance_tail
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; Command::release_all
+</span></span><span class="line"><span class="cl">  |	    |
+</span></span><span class="line"><span class="cl">  |   	|-&gt; Release_all(mtr.m_impl-&gt;m_memo)     释放mtr持有的锁
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  |-&gt; Command::release_resources -&gt; clean mtr.m_impl-&gt;m_log &amp; m_memo
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 </section>
 
 

@@ -1047,7 +1047,251 @@
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-</description>
+&lt;h2 id=&#34;mtr的使用&#34;&gt;mtr的使用
+&lt;/h2&gt;&lt;p&gt;在开启一个mini transaction时，会初始化mtr对象中的m_log和m_memo成员，设置m_state为active。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mtr_t::start
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; 初始化mtr.m_impl-&amp;gt;m_log日志管理对象
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; 初始化mtr.m_impl-&amp;gt;m_memo锁管理对象
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   m_log和m_memo都是mtr_buf_t，以block_t节点m_node域构建的双向链表
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; m_log_mode=MTR_LOG_ALL(记录所有的数据变更) &amp;amp; m_state=MTR_STATE_ACTIVE
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;提交一个mini transaction的过程比较复杂，大致流程是先将m_log中的日志写入公共log buffer，再将m_memo中的加锁并且发生修改的脏page加入flush list，最后释放m_memo中的所有锁。&lt;/p&gt;
+&lt;p&gt;公共log buffer是按照log block格式存储的（包含12B的header和4B的trailer，详见&lt;a class=&#34;link&#34; href=&#34;http://mysql.taobao.org/monthly/2017/09/07/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;前文&lt;/a&gt;中的日志块结构），每个log block大小为512B，并且持久化时以512B进行对齐。每个log block中能存储日志内容的空间为512-12-4=496B。&lt;/p&gt;
+&lt;p&gt;公共log buffer有个原子变量log.sn，其统计的是公共buffer中曾经存储过的日志内容的大小。通过sn可以很容易计算出对应的lsn，其统计的是公共buffer中曾经存储过的以log block格式的日志量的大小。 lsn = (sn / 496 * 512 + sn % 512 + 12)&lt;/p&gt;
+&lt;p&gt;公共log buffer是个循环buffer，其中有三个重要的位点log.write_lsn，log.sn对应的lsn，log.buf_limit_sn对应的lsn。其中log.write_lsn表示已写入磁盘的日志位点（不要求flush），log.sn对应的lsn表示已占位待拷贝的日志位点，log.buf_limit_sn对应的lsn表示可以占位的最大日志位点。满足log.write_lsn &amp;lt;= log.sn对应的lsn &amp;lt;= log.buf_limit_sn对应的lsn。&lt;/p&gt;
+&lt;p&gt;将m_log中的日志写入公共log buffer：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;根据日志数m_n_log_recs是否为1，来判断是single log还是multiple log。对于single log，在日志的开头的日志类型字段中增加MLOG_SINGLE_REC_FLAG。而对于multiple log，在日志结尾增加1B的MLOG_MULTI_REC_END。&lt;/li&gt;
+&lt;li&gt;在公共log buffer中使用原子变量log.sn进行日志占位。&lt;/li&gt;
+&lt;li&gt;在往已占位的日志空间中拷贝日志前，有以下两种情况需要等待：
+&lt;ul&gt;
+&lt;li&gt;若当前的log.sn位点被SN_LOCKED锁定，则要等待log.sn_locked 超过占位前的log.sn。当公共log buffer需要在线变更大小的时候，会进行SN_LOCKED加锁。&lt;/li&gt;
+&lt;li&gt;若日志写入速度过快，来不及写磁盘，就会把log buffer占满，这时需要阻塞等待日志的写磁盘。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;将m_log动态buffer拷贝到公共log buffer，是按照512B大小的buffer粒度进行拷贝的：
+&lt;ul&gt;
+&lt;li&gt;若日志长度超过log block剩余大小，则要做截断，并增加tail和新的header，以满足log block格式&lt;/li&gt;
+&lt;li&gt;若写到log buffer的结尾（默认大小为16M），要继续转向log buffer开头继续拷贝。由于log buffer大小是log block的倍数，所以这里不需要再次做截断。&lt;/li&gt;
+&lt;li&gt;每个buffer拷贝完成后触发一次log.recent_written的Link_buf更新（详见前文），log.recent_written记录完成拷贝的最大连续日志的lsn&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;当m_log日志都写完，要检查已写入的日志是否横跨log block，若横跨了，则要在结尾的log block的header的LOG_BLOCK_FIRST_REC_GROUP字段中标识新mtr的位点end_lsn。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;将m_memo中的加锁并且发生修改的脏page加入flush list：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;遍历m_memo动态buffer中的每个buffer中的每个锁对象mtr_memo_slot_t
+&lt;ul&gt;
+&lt;li&gt;若是page锁，且该page发生了修改，则将该page加入flush list&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;触发一次log.recent_closed的Link_buf更新，log.recent_closed记录添加到flush list的最大连续日志的lsn&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以下是详细流程图：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;90
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mtr_t::commit
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; mtr_t::Command
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(m_n_log_recs&amp;gt;0 || m_modifications)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; (yes)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    v
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   Command::execute 	  将mtr.m_impl-&amp;gt;m_log写入公共log buffer，把脏页加入flush list
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   	|-&amp;gt; prepare_write
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; 若 mtr.m_impl-&amp;gt;m_log_mode为 MTR_LOG_NO_REDO或MTR_LOG_NONE，则直接返回
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; 若 mtr.m_impl-&amp;gt;m_n_log_recs==1，则 m_log.front()-&amp;gt;begin()|=MLOG_SINGLE_REC_FLAG，在日志头Type字段中标识，
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |         否则 m_log-&amp;gt;push(MLOG_MULTI_REC_END)，在日志结尾附加1B
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   	|-&amp;gt; log_buffer_reserve      在公共log buffer中为日志预留空
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; log_buffer_s_lock_enter_reserve
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; 对 log.pfs_psi加 s-lock
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; log.sn.fetch_add(mtr.m_impl-&amp;gt;m_log.m_size)     在公共的log buffer中占位
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; log_buffer_s_lock_wait     若log.sn被SN_LOCKED，则等待log.sn_locked 超过占位前的log.sn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; log_translate_sn_to_lsn      将日志内容的偏移量log.sn 转为log block格式的偏移量start_lsn，start_lsn可以唯一表示日志在log block和公共log buffer中的位置
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; log_wait_for_space_after_reserving     若end_sn &amp;gt; log.buf_limit_sn，则等待
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   	|-&amp;gt; mtr_write_log_t(mtr.m_impl-&amp;gt;m_log.m_list)    将日志内容拷贝至预留的空间
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |   (loop mtr_buf_t::block in m_list)   将mtr.m_impl-&amp;gt;m_log中的日志按block粒度拷贝到公共log buffer
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; log_buffer_write      以log block的 start_lsn%OS_FILE_LOG_BLOCK_SIZE位置的数据 拷贝到公共log buffer的 start_lsn%log.buf_size位置
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; left = OS_FILE_LOG_BLOCK_SIZE - LOG_BLOCK_TRL_SIZE - offset     若日志长度超过log block剩余大小，则要做截断
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; lsn_diff = left + LOG_BLOCK_TRL_SIZE + LOG_BLOCK_HDR_SIZE       若log block写满，要增加tail和新的header
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; 若公共log buffer被写满，则下次从开头继续写。因为每个mtr的日志在解析时大小就不超过2M，肯定不会超过公共log buffer的大小16M
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |     |-&amp;gt; log_block_set_first_rec_group    在新header中设置 LOG_BLOCK_FIRST_REC_GROUP为0
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; log_buffer_set_first_record_group      若mtr日志都写完且 mtr开头和结尾不在同一个log block中，则在新header中设置 LOG_BLOCK_FIRST_REC_GROUP为 end_lsn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; log_buffer_write_completed    每个block拷贝完成后均触发一次Link_buf(并查集)的更新，log.recent_written记录完成拷贝的最大连续日志的lsn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |-&amp;gt; log.recent_written.add_link_advance_tail     在recent_written-&amp;gt;m_links的slot中记录当前日志的end_lsn，m_tail表示已拷贝到log buffer连续日志的end_lsn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |     |-&amp;gt; 若m_tail为当前日志的start_lsn，则推进m_tail为当期日志的end_lsn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |     |-&amp;gt; 否则recent_written-&amp;gt;m_links[start_lsn%capacity] = end_lsn，并推进m_tail
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |           v
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |         log.recent_written.advance_tail_until   等到log.recent_written.m_tail推进到最大lsn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |           |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |           |-&amp;gt; 若recent_written-&amp;gt;m_links[m_tail%capacity] &amp;gt; m_tail，则使用cas更改recent_written-&amp;gt;m_links[m_tail%capacity] = m_tail 来排他访问
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |           |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |           |-&amp;gt; (loop next_position)    推进m_tail为此刻连续的最大lsn，即使没推进到当前日志，其它help线程会帮忙推进
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |-&amp;gt; 若log.recent_written.m_tail &amp;gt; log.current_ready_waiting_lsn，则os_event_set(log.closer_event)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   	|-&amp;gt; add_dirty_blocks_to_flush_list(mtr.m_impl-&amp;gt;m_memo)      将mtr锁管理中记录的脏页加入flush list
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |   (reverse loop mtr_buf_t::block in m_memo)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     v
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |   (reverse loop mtr_memo_slot_t in block)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |     |-&amp;gt; add_to_flush     为了去掉flush_order_mutex，把mtr对应的脏页无序的添加到flush list，在做checkpoint时, 无法保证flush list 上面最头的page lsn是最小的
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           v
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |         add_dirty_page_to_flush_list    把修改后的page加入flush list，当mtr_memo_slot_t.type为MTR_MEMO_PAGE_X_FIX或MTR_MEMO_PAGE_SX_FIX，
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           |                             或为MTR_MEMO_BUF_FIX，且mtr_memo_slot_t.object-&amp;gt;made_dirty_with_no_latch
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |           v
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |     |         buf_flush_note_modification(mtr_memo_slot_t.object)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   	|-&amp;gt; log_buffer_close       将mtr锁管理中记录的脏页处理完后触发一次Link_buf更新，log.recent_closed记录添加到flush list的最大连续日志的lsn
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |           |                    以log.recent_closed.m_tail的lsn来做checkpoint肯定是安全的，
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |           v
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |         log_buffer_s_lock_exit_close
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |           |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |           |-&amp;gt; 对 log.pfs_psi解锁 s-lock
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |           |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |           |-&amp;gt; log.recent_closed.add_link_advance_tail
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; Command::release_all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |	    |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |   	|-&amp;gt; Release_all(mtr.m_impl-&amp;gt;m_memo)     释放mtr持有的锁
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  |-&amp;gt; Command::release_resources -&amp;gt; clean mtr.m_impl-&amp;gt;m_log &amp;amp; m_memo
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
         </item>
         <item>
         <title>高性能网络通信框架 Netty</title>
