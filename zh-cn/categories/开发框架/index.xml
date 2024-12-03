@@ -619,6 +619,30 @@
 </description>
         </item>
         <item>
+        <title>开发框架-概览-spring</title>
+        <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</link>
+        <pubDate>Fri, 11 Oct 2024 01:10:50 +0800</pubDate>
+        
+        <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</guid>
+        <description>&lt;h1 id=&#34;spring框架简介&#34;&gt;Spring框架简介
+&lt;/h1&gt;&lt;p&gt;陈年手写老图介绍：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/spring.jpg&#34;
+	width=&#34;1904&#34;
+	height=&#34;1734&#34;
+	srcset=&#34;https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/spring_hu11562157757765515264.jpg 480w, https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/spring_hu14677250871883959791.jpg 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;手写介绍&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;109&#34;
+		data-flex-basis=&#34;263px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>开发框架-orm-spring</title>
         <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-orm-spring/</link>
         <pubDate>Sun, 15 Sep 2024 01:12:40 +0800</pubDate>
@@ -640,14 +664,6 @@
         <pubDate>Sun, 15 Sep 2024 01:11:09 +0800</pubDate>
         
         <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-ioc-spring/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>开发框架-概览-spring</title>
-        <link>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</link>
-        <pubDate>Sun, 15 Sep 2024 01:10:50 +0800</pubDate>
-        
-        <guid>https://wencynyu.github.io/zh-cn/p/%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-%E6%A6%82%E8%A7%88-spring/</guid>
         <description></description>
         </item>
         
